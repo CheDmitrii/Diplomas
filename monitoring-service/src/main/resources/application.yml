@@ -1,0 +1,60 @@
+server:
+  port: 8228
+#  servlet:
+#    context-path: /monitoring-system
+
+
+spring:
+  application.name: monitoring-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9000/oauth2/jwks
+#          jws-algorithms: RS512
+
+  opcua:
+    client:
+      endpointUri: opc.udp//
+      publishingInterval: 500
+  jackson:
+    default-property-inclusion: NON_NULL
+  db:
+    schemas:
+      default-schema: system
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/monitoring_system?currentSchema=${spring.db.schemas.default-schema}
+    hikari:
+      auto-commit: true
+#  jpa:
+#    properties:
+#      hibernate:
+#        default_schema: ${spring.db.schemas.default-schema}
+  flyway:
+    schemas: ${spring.db.schemas.default-schema}
+#    url: jdbc:postgresql://localhost:5432/monitoring_system
+#    user: postgres
+#    password: postgres
+  kafka:
+    bootstrap-servers: &kafka_servers
+      ? localhost:9092
+    streams:
+#      bootstrap-servers:
+#        << : *kafka_servers
+#        ? localhost:1111
+      application-id: monitoring-system
+      client-id: monitoring-system
+    topics:
+      journal-topic: journal-topic
+#    consumer:
+#      group-id: monitoring
+#      enable-auto-commit: true
+#      isolation-level: read_committed
+
+logging:
+  level:
+    org.hibernate.SQL: TRACE
+    org.springframework.security.oauth2: TRACE
+    org.springframework.security: TRACE

@@ -1,0 +1,24 @@
+server:
+  port: 8000
+spring:
+  application.name: simulation-service
+  jackson:
+    default-property-inclusion: NON_NULL
+  db:
+    schemas:
+      default-schema: system
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/monitoring_system?currentSchema=${spring.db.schemas.default-schema}
+  kafka:
+    bootstrap-servers: &kafka_servers
+      - localhost:9092
+    topics:
+      journal-topic: journal-topic
+    producer:
+      client-id: simulation-client
+      bootstrap-servers:
+        *kafka_servers
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
