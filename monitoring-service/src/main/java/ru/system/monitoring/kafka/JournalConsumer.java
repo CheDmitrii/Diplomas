@@ -13,7 +13,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import ru.system.library.dto.common.JournalEntityDTO;
+import ru.system.library.dto.common.SensorJournalEntityDTO;
 import ru.system.monitoring.service.JournalService;
 
 @Configuration
@@ -27,14 +27,14 @@ public class JournalConsumer {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Bean
-    public KStream<String, JournalEntityDTO> monitoringStream(StreamsBuilder builder) {
-        KStream<String, JournalEntityDTO> stream = builder.stream(
+    public KStream<String, SensorJournalEntityDTO> monitoringStream(StreamsBuilder builder) {
+        KStream<String, SensorJournalEntityDTO> stream = builder.stream(
                 JOURNAL_TOPIC_VALUE,
                 Consumed.with(
                         Serdes.String(),
                         new JsonSerde<>(
                                 new JsonSerializer<>(),
-                                new JsonDeserializer<>(JournalEntityDTO.class)
+                                new JsonDeserializer<>(SensorJournalEntityDTO.class)
                         )
                 )
         );

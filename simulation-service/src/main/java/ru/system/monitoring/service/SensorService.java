@@ -2,7 +2,7 @@ package ru.system.monitoring.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.system.library.dto.common.SensorDTO;
+import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.monitoring.repository.ReferenceRepository;
 import ru.system.monitoring.repository.SensorRepository;
 

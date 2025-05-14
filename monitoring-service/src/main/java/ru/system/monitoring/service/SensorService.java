@@ -3,9 +3,10 @@ package ru.system.monitoring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.system.library.dto.common.JournalEntityDTO;
-import ru.system.library.dto.common.SensorDTO;
+import ru.system.library.dto.common.SensorJournalEntityDTO;
+import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.exception.HttpResponseEntityException;
+import ru.system.monitoring.repository.repository.SensorPermissionRepository;
 import ru.system.monitoring.repository.repository.SensorRepository;
 
 import java.util.List;
@@ -20,22 +21,29 @@ public class SensorService {
 
     private final SensorRepository sensorRepository;
     private final JournalService journalService;
+    private final SensorPermissionRepository sensorPermissionRepository;
 
-    public SensorDTO getSensorById(UUID id) {
-        if (!sensorRepository.existsSensor(id)) {
-            throw new HttpResponseEntityException(HttpStatus.NOT_FOUND, "Sensor with this id {%s} doesn't exist".formatted(id));
+    public SensorDTO getSensorById(UUID sensorId, UUID userId) {
+        if (!sensorRepository.existsSensor(sensorId)) {
+            throw new HttpResponseEntityException(HttpStatus.NOT_FOUND,
+                    "Sensor with this sensorId {%s} doesn't exist".formatted(sensorId));
         }
-        SensorDTO sensorInfo = sensorRepository.getSensorInfo(id);
-        sensorInfo.setJournal(journalService.getSensorJournal(id));
+        if (!sensorPermissionRepository.isAllowedSensor(userId, sensorId)) {
+            throw new HttpResponseEntityException(HttpStatus.FORBIDDEN,
+                    "Sensor with this sensorId {%s} doesn't allowed".formatted(sensorId));
+        }
+        SensorDTO sensorInfo = sensorRepository.getSensorInfo(sensorId);
+        sensorInfo.setJournal(journalService.getSensorJournal(sensorId));
         return sensorInfo;
     }
 
-    public List<SensorDTO> getAllSensors() {
-        List<SensorDTO> allSensors = sensorRepository.getAllSensors();
-        Map<UUID, List<JournalEntityDTO>> collectJournal = journalService.getAllSensorsData().stream()
+    public List<SensorDTO> getAllSensors(UUID userId) {
+        List<SensorDTO> allSensors = sensorRepository.getAllSensors(userId);
+        Map<UUID, List<SensorJournalEntityDTO>> collectJournal = journalService.getAllSensorsData(userId)
+                .stream()
                 .collect(
                         Collectors.groupingBy(
-                                JournalEntityDTO::getId,
+                                SensorJournalEntityDTO::getId,
                                 TreeMap::new,
                                 Collectors.mapping(
                                         v -> {

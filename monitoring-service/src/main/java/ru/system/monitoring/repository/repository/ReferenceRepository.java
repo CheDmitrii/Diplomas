@@ -34,18 +34,21 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
                 referenceMapper);
     }
 
-    public List<ReferenceDTO> getAllReferences() {
-        return namedParameterJdbcTemplate.query(ReferenceSQLQueries.GET_ALL_REFERENCES, referenceMapper);
+    public List<ReferenceDTO> getAllReferences(UUID userId) {
+        return namedParameterJdbcTemplate.query(
+                ReferenceSQLQueries.GET_ALL_REFERENCES,
+                Map.of("user_id", userId),
+                referenceMapper);
     }
 
-    public List<ReferenceHistoryEntityDTO> getReferenceHistory(UUID id) {
+    public List<ReferenceHistoryEntityDTO> getReferenceHistory(UUID referenceId) {
         return namedParameterJdbcTemplate.query(
                 ReferenceSQLQueries.GET_REFERENCE_HISTORY_BY_ID,
-                Map.of("id", id),
+                Map.of("reference_id", referenceId),
                 referenceHistoryMapper);
     }
 
-    public List<ReferenceHistoryEntityDTO> getAllReferenceHistory() {
+    public List<ReferenceHistoryEntityDTO> getAllReferenceHistory(UUID userID) {
         return namedParameterJdbcTemplate.query(
                 ReferenceSQLQueries.GET_ALL_REFERENCE_HISTORY,
                 referenceHistoryMapper
@@ -55,14 +58,14 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
 
     public void changeValue(RequestUpdateReferenceDTO updateReference, Timestamp time) {
         namedParameterJdbcTemplate.update(
-                ReferenceSQLQueries.CREATE_REFERENCE_HISTORY,
-                Map.of("id", updateReference.getId(),
+                ReferenceSQLQueries.CREATE_REFERENCE_JOURNAL,
+                Map.of("reference_id", updateReference.getId(),
                         "old_value", updateReference.getOldValue(),
                         "new_value", updateReference.getNewValue(),
                         "time", time)
         );
         namedParameterJdbcTemplate.update(
                 ReferenceSQLQueries.UPDATE_VALUE,
-                Map.of("id", updateReference.getId(), "value", updateReference.getNewValue()));
+                Map.of("reference_id", updateReference.getId(), "value", updateReference.getNewValue()));
     }
 }

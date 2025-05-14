@@ -3,6 +3,8 @@ server:
 
 spring:
   application.name: authentication-sevice
+  jackson:
+    default-property-inclusion: NON_NULL
   db:
     schemas:
       default-schema: system
@@ -13,22 +15,33 @@ spring:
     hikari:
       auto-commit: true
   jpa:
+    show-sql: true
     properties:
       hibernate:
         default_schema: ${spring.db.schemas.default-schema}
+        show_sql: true
+        use_sql_comments: true
+        format_sql: true
   data:
     redis:
       host: localhost
       port: 6379
       username: redis
       password: password
-  security:
-    oauth2:
 
+cache:
+  redis:
+    cacheNames:
+      - cacheName: test
+        ttl:
+        typeDuration: m
 
 logging:
   level:
-    org.springframework.security: TRACE
-    org.springframework.security.oauth2: TRACE
-    org.springframework.web: DEBUG
+#    org.springframework.security: TRACE
+#    org.springframework.security.oauth2: TRACE
+#    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: trace
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.nimbusds: TRACE

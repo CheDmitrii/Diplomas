@@ -3,7 +3,7 @@ package ru.system.monitoring.repository;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.system.library.dto.common.ReferenceDTO;
-import ru.system.library.dto.common.SensorDTO;
+import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.sql.queries.ReferenceSQLQueries;
 import ru.system.library.sql.repository.repository.ReferenceRepositoryInterface;
 
@@ -22,8 +22,7 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
                 Map.of(
                         "sensor_id", sensor_id,
                         "name", reference.getName(),
-                        "value", reference.getValue(),
-                        "type", sensorDTO.getType()
+                        "value", reference.getValue()
                 ),
                 UUID.class
         );

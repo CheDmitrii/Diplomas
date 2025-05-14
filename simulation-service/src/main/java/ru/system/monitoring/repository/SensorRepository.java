@@ -2,7 +2,7 @@ package ru.system.monitoring.repository;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.system.library.dto.common.SensorDTO;
+import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.sql.queries.SensorSQLQueries;
 import ru.system.library.sql.repository.repository.SensorRepositoryInterface;
 
@@ -21,7 +21,7 @@ public class SensorRepository extends SensorRepositoryInterface {
                 SensorSQLQueries.CREATE_SENSOR,
                 Map.of(
                         "name", sensorDTO.getName(),
-                        "type", sensorDTO.getType(),
+                        "machine_id", sensorDTO.getMachine().getId(),
                         "description", sensorDTO.getDescription()
                 ),
                 UUID.class

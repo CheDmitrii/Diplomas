@@ -3,12 +3,14 @@ package ru.system.library.config.mapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.system.library.sql.repository.mapper.*;
+import ru.system.library.sql.repository.mapper.machine.MachineMapper;
+import ru.system.library.sql.repository.mapper.machine.MachineSensorMapper;
 
 @Configuration
 public class MapperConfig {
     @Bean
-    public JournalEntityMapper kafkaJournalEntityMapper() {
-        return new JournalEntityMapper();
+    public SensorJournalEntityMapper kafkaJournalEntityMapper() {
+        return new SensorJournalEntityMapper();
     }
 
     @Bean
@@ -17,8 +19,8 @@ public class MapperConfig {
     }
 
     @Bean
-    public JournalEntityMapperCut journalEntityMapper() {
-        return new JournalEntityMapperCut();
+    public SensorJournalEntityMapperCut journalEntityMapper() {
+        return new SensorJournalEntityMapperCut();
     }
 
     @Bean
@@ -29,5 +31,15 @@ public class MapperConfig {
     @Bean
     public ReferenceMapper referenceMapper() {
         return new ReferenceMapper();
+    }
+
+    @Bean
+    public MachineMapper machineMapper() {
+        return new MachineMapper();
+    }
+
+    @Bean
+    public MachineSensorMapper machineSensorMapper() {
+        return new MachineSensorMapper();
     }
 }

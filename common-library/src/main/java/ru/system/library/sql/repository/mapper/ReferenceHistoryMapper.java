@@ -16,7 +16,7 @@ public class ReferenceHistoryMapper implements RowMapper<ReferenceHistoryEntityD
     @Override
     public ReferenceHistoryEntityDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
         return ReferenceHistoryEntityDTO.builder()
-                .id(UUID.fromString(rs.getString("id")))
+                .id(UUID.fromString(rs.getString("reference_id")))
                 .time(rs.getTimestamp("time", calendar))
                 .oldValue(rs.getDouble("old_value"))
                 .newValue(rs.getDouble("new_value"))

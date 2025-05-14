@@ -2,25 +2,72 @@ version: '3.9'
 
 services:
 
-# echo "user default on nopass ~* +@all" > /usr/local/etc/redis/users.acl &&
   redis:
-    image: redis:latest
+    image: redis/redis-stack:latest
+    #redis - single redis container
+    #/redis-stack - is an enhanced version of the classic Redis that combines the core Redis OSS server with a set of powerful modules and modern capabilities for real-time data processing in a single package.
+    #      Modules:
+    #       - RedisJSON – working with JSON documents, allowing you to store and efficiently manipulate structured data.
+    #       - RediSearch – full-text search and complex querying capabilities.
+    #       - RedisTimeSeries – a specialized module for storing and analyzing time-series data.
+    #       - RedisBloom – probabilistic data structures for memory-efficient operations, such as Bloom filters.
+    #       - (It may also include RedisGraph and other modules depending on the version.)
+    #/redis-stack-server - like /redis-stack but without RedisInsight (graphic interface)
+    #COMMAND TO RUN REDIS:
+    # - 'redis-server' run single redis
+    # - 'redis-stack' run redis stack
+    # - 'redis-stack-serer' run redis stack server
+    # '--protected-mode no' off secured mode that allow connect any configuring interfaces (like localhost, 127.0.0.1 etc)
     # COMMAND for getting users
     #-----------------------------------
     # redis-cli -a password ACL LIST
     #-----------------------------------
-    # ~* +@all
-    # ~* access for any keys
-    # +@all allow executing any command
+    # command '~* +@all'
+    #   ~* - access for any keys
+    #   +@all - allow executing any command
+    # if modules don't loaded ( --loadmodule /opt/redis-stack/lib/redisearch.so; --loadmodule /opt/redis-stack/lib/rejson.so; etc)
+    #
+    # ANOTHER WAY TO WRITE docker-compose
+    # may instead command create files and mountain it in docker container
+    # DATA of users.acl file (can add 'user default off' line then off default user):
+    #     user redis on >password ~* +@all
+    # DATA of redis.conf file (can add 'user default off' line then off default user):
+    #     bind 0.0.0.0
+    #     aclfile /usr/local/etc/redis/users.acl
+    # add volumes in docker-compose
+    #     volumes:
+    #      - ./docker/redis/config/users.acl:/usr/local/etc/redis/users.acl:ro
+    #      - ./docker/redis/config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    #
+    # and add environment REDIS_ARGS that add when container start (--protected-mode no don't nee if it exist in users.acl file)
+    #    environment:
+    #      - REDIS_ARGS=--aclfile /usr/local/etc/redis/users.acl --protected-mode no
+    # command: redis-stack-server /usr/local/etc/redis/redis.conf
     command: >
-      sh -c '
-              mkdir -p /usr/local/etc/redis &&
-              touch /usr/local/etc/redis/redis.conf &&
-              echo "user redis on >password ~* +@all" >> /usr/local/etc/redis/users.acl &&
-              redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
-            '
+         sh -c '
+                       mkdir -p /usr/local/etc/redis &&
+                       touch /usr/local/etc/redis/redis.conf &&
+                       touch /usr/local/etc/redis/users.acl &&
+                       grep -qxF "user default off" /usr/local/etc/redis/users.acl ||
+                       echo "user default off" >> /usr/local/etc/redis/users.acl &&
+                       grep -qxF "user redis on >password ~* +@all" /usr/local/etc/redis/users.acl ||
+                       echo "user redis on >password ~* +@all" >> /usr/local/etc/redis/users.acl &&
+                       echo "bind 0.0.0.0\nprotected-mode no" > /usr/local/etc/redis/redis.conf &&
+                       redis-stack-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
+              '
     ports:
-      - "6379:6379"
+      - "6379:6379" # port for redis
+#      - "8001:8001" # port for redisinsight (for redisinsight abd server together, but if use only redisinsight then port should be 5540)
+    networks:
+      - redis-net
+
+  redisinsight:
+    # in host in browser put 'redis' in host parameter as it name of service (to show it run 'docker-compose ps' command when you up your compose
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540" # for single redisinsight
+    networks:
+      - redis-net
 
   kafka:
     image: bitnami/kafka:latest
@@ -59,3 +106,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+
+networks:
+  redis-net:

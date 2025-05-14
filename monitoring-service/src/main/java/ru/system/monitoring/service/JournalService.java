@@ -3,8 +3,8 @@ package ru.system.monitoring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.system.library.dto.common.JournalEntityDTO;
-import ru.system.monitoring.repository.repository.JournalRepository;
+import ru.system.library.dto.common.SensorJournalEntityDTO;
+import ru.system.monitoring.repository.repository.SensorJournalRepository;
 import ru.system.monitoring.repository.repository.SensorRepository;
 
 import java.util.List;
@@ -13,12 +13,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class JournalService {
-    private final JournalRepository journalRepository;
+    private final SensorJournalRepository sensorJournalRepository;
     private final SensorRepository sensorRepository;
 
     @Async
-    public void saveJournal(JournalEntityDTO journalEntityDTO) {
-        journalRepository.writeJournal(journalEntityDTO);
+    public void saveJournal(SensorJournalEntityDTO sensorJournalEntityDTO) {
+        sensorJournalRepository.writeJournal(sensorJournalEntityDTO);
     }
 
     public boolean isSensorExist(UUID id) {
@@ -26,11 +26,11 @@ public class JournalService {
     }
 
 
-    public List<JournalEntityDTO> getSensorJournal(UUID sensor_id) {
-        return journalRepository.getAllJournals(sensor_id);
+    public List<SensorJournalEntityDTO> getSensorJournal(UUID sensorId) {
+        return sensorJournalRepository.getAllJournalsBySensor(sensorId);
     }
 
-    public List<JournalEntityDTO> getAllSensorsData() {
-        return journalRepository.getAllJournals();
+    public List<SensorJournalEntityDTO> getAllSensorsData(UUID userId) {
+        return sensorJournalRepository.getAllJournals(userId);
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import ru.system.library.dto.common.JournalEntityDTO;
+import ru.system.library.dto.common.SensorJournalEntityDTO;
 
 @Configuration
 @EnableKafka
@@ -17,12 +17,12 @@ public class KafkaConfig {
     private final KafkaProperties kafkaProperties;
 
     @Bean
-    public ProducerFactory<String, JournalEntityDTO> producerFactory() {
+    public ProducerFactory<String, SensorJournalEntityDTO> producerFactory() {
         return new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties());
     }
 
     @Bean
-    public KafkaTemplate<String, JournalEntityDTO> kafkaTemplate() {
+    public KafkaTemplate<String, SensorJournalEntityDTO> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

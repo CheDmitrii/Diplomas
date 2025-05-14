@@ -1,5 +1,6 @@
 package ru.system.monitoring.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import ru.system.library.dto.common.SensorDTO;
+import reactor.core.scheduler.Schedulers;
+import ru.system.library.dto.common.sensor.SensorDTO;
+import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.SensorService;
 
 import java.util.List;
@@ -22,18 +25,22 @@ import java.util.UUID;
 public class SensorController {
 
     private final SensorService sensorService;
+    private final ClaimService claimService;
+    // todo: add machineDTO
 
     @GetMapping("/{id:.+}")
     public Mono<ResponseEntity<SensorDTO>> getSensorById(@PathVariable("id") final UUID id) {
-        return Mono.just(ResponseEntity.ok(sensorService.getSensorById(id)));
+//        return Mono.just(ResponseEntity.ok(sensorService.getSensorById(id)));
+        return Mono.fromCallable(() ->
+                ResponseEntity.ok(sensorService.getSensorById(id, claimService.getUserId()))
+        ).subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/all-sensors")
     public Mono<ResponseEntity<List<SensorDTO>>> getAllSensors() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null && authentication.getCredentials() == null) {
-            System.out.println((Jwt) authentication.getCredentials());
-        } // todo implements service to get from jwt userid
-        return Mono.just(ResponseEntity.ok(sensorService.getAllSensors()));
+//        return Mono.just(ResponseEntity.ok(sensorService.getAllSensors()));
+        return Mono.fromCallable(() ->
+                ResponseEntity.ok(sensorService.getAllSensors(claimService.getUserId()))
+        ).subscribeOn(Schedulers.boundedElastic());
     }
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import ru.system.library.dto.common.JournalEntityDTO;
+import ru.system.library.dto.common.SensorJournalEntityDTO;
 import ru.system.monitoring.service.JournalService;
 
 import java.sql.Timestamp;
@@ -20,7 +20,7 @@ public class SimulationController {
 
     @PostMapping("/send-parameter/{id:.+}")
     public Mono<ResponseEntity<Void>> sendParameter(@PathVariable("id") UUID id, @RequestBody double value) {
-        journalService.sendJournal(JournalEntityDTO.builder()
+        journalService.sendJournal(SensorJournalEntityDTO.builder()
                 .id(id)
                 .value(value)
                 .time(Timestamp.valueOf(LocalDateTime.now()))

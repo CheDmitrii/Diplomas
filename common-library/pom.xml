@@ -33,10 +33,10 @@
     <properties>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+            <optional>true</optional><!-- if optional true then it will not add in module that include this library if it's not explicitly include-->
         </dependency>
         <!--  todo think to switch on dependencyManager  -->
     </dependencies>

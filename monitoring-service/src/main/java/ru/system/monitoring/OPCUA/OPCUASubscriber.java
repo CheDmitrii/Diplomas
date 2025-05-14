@@ -5,21 +5,21 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
+import org.eclipse.milo.opcua.sdk.client.api.UaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfig;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaMonitoredItem;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient;
 import org.eclipse.milo.opcua.stack.core.AttributeId;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
-import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
-import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
-import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
+import org.eclipse.milo.opcua.stack.core.serialization.SerializationContext;
+import org.eclipse.milo.opcua.stack.core.types.builtin.*;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.DataChangeTrigger;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.DeadbandType;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.MonitoringMode;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
-import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
-import org.eclipse.milo.opcua.stack.core.types.structured.MonitoredItemCreateRequest;
-import org.eclipse.milo.opcua.stack.core.types.structured.MonitoringParameters;
-import org.eclipse.milo.opcua.stack.core.types.structured.ReadValueId;
+import org.eclipse.milo.opcua.stack.core.types.structured.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -49,25 +49,43 @@ public class OPCUASubscriber {
                 .build();
 
         client = OpcUaClient.create(config);
-        client.connect().get();
-//        client.getStaticDataTypeManager().registerCodec("Current Time",1, St);
+        log.error("connection OPC UA state {}", client.connect().get().getSession().state());
+//        client.sendRequest();
 
-        subscription = client.getSubscriptionManager()
-                .createSubscription(1000.0).get();
+        subscription = client.getSubscriptionManager().createSubscription(100.0).get();
+        log.error("{}", subscription.getRequestedPublishingInterval());
 
-        NodeId nodeId = new NodeId(1, "current-time");
+        NodeId nodeId = new NodeId(1, "data");
+        // new QualifiedName(1, "Current Time")
+        ReadValueId readValueId = new ReadValueId(nodeId, AttributeId.Value.uid(), null, null);
+
+//        DataChangeFilter filter = new DataChangeFilter(
+//                DataChangeTrigger.StatusValue,
+//                UInteger.valueOf(DeadbandType.None.getValue()),
+//                0.0
+//        );
+//        SerializationContext serializationContext = client.getStaticSerializationContext();
+//        ExtensionObject filterExtension = ExtensionObject.encode(serializationContext, filter);
+
+        MonitoringParameters parameters = new MonitoringParameters(
+                UInteger.valueOf(1),
+                100.0,
+                null,
+                uint(50),
+                Boolean.TRUE
+                );
+        MonitoredItemCreateRequest monitoredItemCreateRequest = new MonitoredItemCreateRequest(readValueId, MonitoringMode.Reporting, parameters);
         UaMonitoredItem monitoredItem = subscription.createMonitoredItems(
                 TimestampsToReturn.Both,
-                Collections.singletonList(new MonitoredItemCreateRequest(
-                        new ReadValueId(nodeId, AttributeId.Value.uid(), null, null),
-                        MonitoringMode.Reporting,
-                        new MonitoringParameters(uint(1), 1000.0, null, uint(10), true)
-                )),
-                (item, value) -> {
-                    log.error("Monitored item created: {}", value);
-                    System.out.println("Value changed: " + value);
+                List.of(monitoredItemCreateRequest),
+                (item, status) -> {
+                    log.info("Monitored item status: {}", StatusCode.GOOD.getValue() == status);
                 }
-        ).get().get(0);
+        ).get().getFirst();
+        log.error("{}", monitoredItem.getRequestedSamplingInterval());
+        log.error("{}", monitoredItem.getRevisedSamplingInterval());
+
+        monitoredItem.setValueConsumer(value -> log.info("value of node is {}", (String) value.getValue().getValue()));
     }
 
     @PreDestroy

@@ -1,6 +1,7 @@
 package ru.system.monitoring.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ru.system.library.dto.common.ReferenceDTO;
 import ru.system.monitoring.dto.RequestUpdateReferenceDTO;
+import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.ReferenceService;
 
 import java.sql.Timestamp;
@@ -25,22 +28,34 @@ public class ReferenceController {
 
     private final ReferenceService referenceService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ClaimService claimService;
 
     @MessageMapping("/reference/update") // for this annotation doesn't work @RequestMapping (send on "/app" (from socket config) + "/reference/update")
-    public void changeReference(@Valid RequestUpdateReferenceDTO update) {
+    public Mono<Void> changeReference(@Valid @NotNull RequestUpdateReferenceDTO update) {
         Timestamp time = Timestamp.valueOf(LocalDateTime.now());
-        referenceService.saveChanges(update, time);
-        messagingTemplate.convertAndSend("/topic/references", update);
-        messagingTemplate.convertAndSend("/topic/references" + update.getId(), update);
+        return referenceService
+                .saveChanges(update, time)
+                .doOnSuccess(v ->
+                        messagingTemplate.convertAndSend("/topic/references" + update.getId(), update)
+                )
+                .then();
     }
 
     @GetMapping("/history/all")
     public Flux<ReferenceDTO> getReferences() {
-        return Flux.fromIterable(referenceService.getAllReferences());
+//        return Flux.fromIterable(referenceService.getAllReferences());
+        return Mono.fromCallable(() ->
+                        referenceService.getAllReferences(claimService.getUserId())
+                )
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMapMany(Flux::fromIterable);
     }
 
     @GetMapping("/history/{id:.+}")
-    public Mono<ReferenceDTO> getReferenceById(@PathVariable("id") final UUID id) {
-        return Mono.just(referenceService.getReference(id));
+    public Mono<ReferenceDTO> getReferenceById(@PathVariable("id") @NotNull final UUID id) {
+        return Mono.fromCallable(() ->
+                        referenceService.getReference(id, claimService.getUserId())
+                )
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }
