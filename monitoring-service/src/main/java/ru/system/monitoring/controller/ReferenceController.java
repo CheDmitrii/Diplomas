@@ -43,9 +43,9 @@ public class ReferenceController {
 
     @GetMapping("/history/all")
     public Flux<ReferenceDTO> getReferences() {
-//        return Flux.fromIterable(referenceService.getAllReferences());
         return Mono.fromCallable(() ->
-                        referenceService.getAllReferences(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
+                        referenceService.getAllReferences(claimService.getUserId())
+//                        referenceService.getAllReferences(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
                 )
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(Flux::fromIterable);
@@ -54,7 +54,8 @@ public class ReferenceController {
     @GetMapping("/history/{id:.+}")
     public Mono<ReferenceDTO> getReferenceById(@PathVariable("id") @NotNull final UUID id) {
         return Mono.fromCallable(() ->
-                        referenceService.getReference(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
+                        referenceService.getReference(id, claimService.getUserId())
+//                        referenceService.getReference(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
                 )
                 .subscribeOn(Schedulers.boundedElastic());
     }

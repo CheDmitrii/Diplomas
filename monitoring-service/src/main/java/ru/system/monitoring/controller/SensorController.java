@@ -2,13 +2,14 @@ package ru.system.monitoring.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import ru.system.library.dto.common.sensor.SensorCheckedDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
+import ru.system.library.exception.HttpResponseEntityException;
 import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.SensorService;
 
@@ -29,14 +30,16 @@ public class SensorController {
     @GetMapping("/{id:.+}")
     public Mono<ResponseEntity<SensorDTO>> getSensorById(@PathVariable("id") final UUID id) { // todo: change from id
         return Mono.fromCallable(() ->
-                ResponseEntity.ok(sensorService.getSensorById(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
+//                ResponseEntity.ok(sensorService.getSensorById(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
+                ResponseEntity.ok(sensorService.getSensorById(id, claimService.getUserId()))
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/all-sensors")
     public Mono<ResponseEntity<List<SensorDTO>>> getAllSensors() { // todo: change from id
         return Mono.fromCallable(() ->
-                ResponseEntity.ok(sensorService.getAllSensors(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
+//                ResponseEntity.ok(sensorService.getAllSensors(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
+                        ResponseEntity.ok(sensorService.getAllSensors(claimService.getUserId()))
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -54,23 +57,27 @@ public class SensorController {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ADMIN')")
     public Mono<ResponseEntity<Map<String, UUID>>> createSensor(@RequestBody @Valid SensorDTO sensor) {
         return Mono.fromCallable(
-                    () -> sensorService.createSensor(sensor)
+                    () -> {
+                        String role = claimService.getRole();
+                        if (role == null || !role.equalsIgnoreCase("admin")) {
+                            throw new HttpResponseEntityException(HttpStatus.FORBIDDEN, "Access denied");
+                        }
+                        return sensorService.createSensor(sensor);
+                    }
                 )
-                .map(
-                        v -> ResponseEntity.ok(Map.of("id", v))
-                ).subscribeOn(Schedulers.boundedElastic());
+                .map(v -> ResponseEntity.ok(Map.of("id", v)))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/test")
     public Integer testCal() throws ExecutionException, InterruptedException {
-        return sensorService.getValuetTest();
+        return sensorService.getValuetTest(); // todo: drop
     }
 
     @GetMapping("/test-method")
     public SensorCheckedDTO[] testCall() throws ExecutionException, InterruptedException {
-        return sensorService.testMethod();
+        return sensorService.testMethod(); // todo: drop
     }
 }

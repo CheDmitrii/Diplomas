@@ -46,7 +46,8 @@ public class JournalConsumer {
             }
             journalService.saveJournal(v);
             log.info("Save journal {}", v);
-            messagingTemplate.convertAndSend("/topic/journal", v);
+            // todo: right way write in in one socket instead each sensor socket
+//            messagingTemplate.convertAndSend("/topic/journal", v); // todo: think don't need
             messagingTemplate.convertAndSend("/topic/journal" + v.getId(), v);
         });
         return stream;

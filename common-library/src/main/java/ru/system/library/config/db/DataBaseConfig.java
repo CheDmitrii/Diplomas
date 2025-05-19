@@ -12,6 +12,7 @@ public class DataBaseConfig {
 
     // TODO: add if not exists in migration in both place
     // todo: in diplomas implement security, UPC server, switch on JPA and maybe use rsockets
+    // todo: think how create this bean if don't exist Data JPA
     @Bean
     @ConditionalOnBean(DataSource.class)
     public NamedParameterJdbcTemplate getJDBCTemplate(DataSource dataSource) {

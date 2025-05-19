@@ -1,5 +1,6 @@
 package ru.system.monitoring.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -64,12 +65,12 @@ public class SensorService {
         return allSensors;
     }
 
-    public UUID createSensor(SensorDTO createSensor) {
+    public UUID createSensor(SensorDTO createSensor) throws ExecutionException, JsonProcessingException, InterruptedException {
         UUID sensorId = sensorRepository.createSensor(createSensor);
         if (createSensor.getReference() != null) {
             referenceRepository.createReference(createSensor.getReference(), createSensor, sensorId);
         }
-//        opcuaSubscriber.createSensor(); // todo: implement
+        opcuaSubscriber.createSensor(createSensor);
         return sensorId;
     }
 
@@ -81,10 +82,10 @@ public class SensorService {
     }
 
     public Integer getValuetTest() throws ExecutionException, InterruptedException {
-        return opcuaSubscriber.getValue();
+        return opcuaSubscriber.getValue();// todo: drop
     }
 
     public SensorCheckedDTO[] testMethod() throws ExecutionException, InterruptedException {
-        return opcuaSubscriber.checkSensors();
+        return opcuaSubscriber.checkSensors(); // todo: drop
     }
 }

@@ -26,10 +26,8 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.system.authentication.entity.Role;
-import ru.system.authentication.service.user.userDetails.CustomUserDetailsServer;
 import ru.system.authentication.entity.User;
-
+import ru.system.authentication.service.user.userDetails.CustomUserDetailsServer;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -67,20 +65,6 @@ public class OAuth2AuthorizationServerConfig {
 //                .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login/**"))
 //                .oauth2ResourceServer(oauth -> oauth.jwt())
                 .formLogin(login -> login.loginPage(LOGIN_URL_VALUE));
-//                .logout(logout -> logout
-//                        .logoutUrl("/logout")
-////                        .logoutSuccessUrl("/oauth2/test")
-//                        .logoutSuccessHandler((request, response, authentication) -> {
-//                            SecurityContextHolder.clearContext();
-//                            response.sendRedirect("/oauth2/logout");
-//                        })
-//                        .invalidateHttpSession(true)
-//                        .deleteCookies("JSESSIONID")
-//                        .permitAll()
-//                )
-//                .oauth2ResourceServer(oauth ->
-//                        oauth.jwt(jwt -> jwt.jwtAuthenticationConverter()))
-//                .userDetailsService(userDetailsService);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
 
         return http.build();
@@ -106,8 +90,6 @@ public class OAuth2AuthorizationServerConfig {
                 .redirectUri("http://localhost:9000/oauth2/callback")
                 .scope(OidcScopes.OPENID)
                 .scope("offline_access")
-//                .scope("read")
-//                .scope("write")
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofMinutes(20))
                         .refreshTokenTimeToLive(Duration.ofMinutes(30))
@@ -140,6 +122,7 @@ public class OAuth2AuthorizationServerConfig {
                 .issuer("http://localhost:9000")
                 .build();
     }
+
 //    @Bean
 //    public OidcProviderMetadataClaimCustomizer providerMetadataCustomizer() {
 //        OidcProviderMetadataClaimAccessor
@@ -172,8 +155,6 @@ public class OAuth2AuthorizationServerConfig {
                           )
                     )
                     .build();
-//            context.getJwsHeader().algorithm(SignatureAlgorithm.RS512).build();
-//            context.getHeaders().algorithm(SignatureAlgorithm.RS512);
         };
     }
 
@@ -186,7 +167,6 @@ public class OAuth2AuthorizationServerConfig {
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID(UUID.randomUUID().toString())
-//                .algorithm(new Algorithm("RS512"))
                 .build();
         return (jwkSelector, securityContext) -> jwkSelector.select(new JWKSet(rsaKey));
     }

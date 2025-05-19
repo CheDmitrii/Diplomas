@@ -25,11 +25,6 @@ public class LogoutSuccessHandler implements LogoutHandler {
     private final RedisCacheManager cacheManager;
     private final UserService userService;
 
-//    @Override
-//    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-//
-//    }
-
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         var principal = authentication.getPrincipal();
@@ -47,10 +42,5 @@ public class LogoutSuccessHandler implements LogoutHandler {
         log.error("User {} success logout", user.getLogin());
         SecurityContextHolder.clearContext();
         request.getSession().invalidate();
-//        try {
-//            response.sendRedirect(POST_LOGOUT_URL);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 }

@@ -32,10 +32,9 @@ public class MachineController {
     }
 
     @GetMapping("/all-machines")
-    public Mono<ResponseEntity<List<MachineDTO>>> createMachine() {
+    public Mono<ResponseEntity<List<MachineDTO>>> getMachines() {
         return Mono.fromCallable(() ->
                 ResponseEntity.ok(machineService.getAllMachines(claimService.getUserId()))
         ).subscribeOn(Schedulers.boundedElastic());
-//        return null;
     }
 }

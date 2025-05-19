@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableWebFluxSecurity
+//@EnableWebFluxSecurity
 @Slf4j
 public class SecurityConfig {
 
@@ -35,9 +34,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/roles").hasRole("USER")
-                                .requestMatchers("/admin/**").permitAll()
-                                .requestMatchers("/loginss", "/login").permitAll()
+                                .requestMatchers("/loginss", "/login").permitAll() // todo: custom login???
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login", "/loginss", "/logout/**"))
@@ -67,30 +64,6 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(new JwtRoleConverter())
                         )
                 );
-
-
-//        http
-//                .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/oauth2/**").permitAll() // Разрешить доступ к эндпоинтам OAuth2
-//                        .anyRequest().permitAll()
-//                )
-////                .exceptionHandling(ex -> ex.
-////                        authenticationEntryPoint(oauth2AuthenticationEntryPoint())
-////                )
-////                .exceptionHandling(ex -> ex
-////                        .authenticationEntryPoint((req, res, authEx) -> {
-////                            res.setContentType("application/json");
-////                            res.setStatus(401);
-////                            res.getWriter().write(String.format(
-////                                    "{\"error\":\"%s\", \"description\":\"%s\"}",
-////                                    "invalid_client",
-////                                    authEx.getMessage()
-////                            ));
-////                        })
-////                )
-////                .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login/**")) // Отключить CSRF для токеновых эндпоинтов
-//                .formLogin(Customizer.withDefaults());
-
         return http.build();
     }
 
