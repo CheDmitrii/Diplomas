@@ -36,6 +36,11 @@ spring:
 #    url: jdbc:postgresql://localhost:5432/monitoring_system
 #    user: postgres
 #    password: postgres
+  opc:
+    server:
+      host: "opc.tcp://localhost:4840"
+    uri:
+      sensors: http://sensors
   kafka:
     bootstrap-servers: &kafka_servers
       ? localhost:9092

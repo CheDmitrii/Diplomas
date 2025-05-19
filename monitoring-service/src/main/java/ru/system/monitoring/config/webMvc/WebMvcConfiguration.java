@@ -38,5 +38,4 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
         configurer.setTaskExecutor(asyncTaskExecutor());
     }
-
 }

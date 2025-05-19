@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.system.library.dto.common.SensorJournalEntityDTO;
+import ru.system.library.dto.common.sensor.SensorCheckedDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.exception.HttpResponseEntityException;
+import ru.system.monitoring.OPCUA.OPCUASubscriber;
+import ru.system.monitoring.repository.repository.ReferenceRepository;
 import ru.system.monitoring.repository.repository.SensorPermissionRepository;
 import ru.system.monitoring.repository.repository.SensorRepository;
 
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,8 +24,10 @@ import java.util.stream.Collectors;
 public class SensorService {
 
     private final SensorRepository sensorRepository;
+    private final ReferenceRepository referenceRepository;
     private final JournalService journalService;
     private final SensorPermissionRepository sensorPermissionRepository;
+    private final OPCUASubscriber opcuaSubscriber;
 
     public SensorDTO getSensorById(UUID sensorId, UUID userId) {
         if (!sensorRepository.existsSensor(sensorId)) {
@@ -56,5 +62,29 @@ public class SensorService {
                 );
         allSensors.forEach(v -> v.setJournal(collectJournal.get(v.getId())));
         return allSensors;
+    }
+
+    public UUID createSensor(SensorDTO createSensor) {
+        UUID sensorId = sensorRepository.createSensor(createSensor);
+        if (createSensor.getReference() != null) {
+            referenceRepository.createReference(createSensor.getReference(), createSensor, sensorId);
+        }
+//        opcuaSubscriber.createSensor(); // todo: implement
+        return sensorId;
+    }
+
+    public SensorCheckedDTO[] checkSensor(UUID userId) throws ExecutionException, InterruptedException {
+        if (userId == null) {
+            return opcuaSubscriber.checkSensors();
+        }
+        return opcuaSubscriber.checkSensors(sensorPermissionRepository.getUserSensors(userId));
+    }
+
+    public Integer getValuetTest() throws ExecutionException, InterruptedException {
+        return opcuaSubscriber.getValue();
+    }
+
+    public SensorCheckedDTO[] testMethod() throws ExecutionException, InterruptedException {
+        return opcuaSubscriber.checkSensors();
     }
 }

@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class SensorSQLQueries {// todo: fixed
+    public final String GET_ALL_SENSORS_IDS = """
+            SELECT s.id FROM system.sensor s;
+            """;
     public final String GET_ALL_SENSORS = """
             SELECT s.*, r.id as reference_id, r.value, r.name as reference_name, m.name as machine_name FROM system.sensor s
             LEFT JOIN system.reference r ON s.id=r.sensor_id

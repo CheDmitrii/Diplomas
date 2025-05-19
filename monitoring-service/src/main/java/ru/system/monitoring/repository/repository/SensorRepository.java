@@ -35,4 +35,12 @@ public class SensorRepository extends SensorRepositoryInterface {
                 sensorMapper
         );
     }
+
+    public List<UUID> getAllSensorsIds() {
+        return namedParameterJdbcTemplate.queryForList(
+                SensorSQLQueries.GET_ALL_SENSORS_IDS,
+                Map.of(),
+                UUID.class
+        );
+    }
 }

@@ -28,7 +28,7 @@ public class ReferenceController {
 
     private final ReferenceService referenceService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final ClaimService claimService;
+    private final ClaimService claimService; //todo: start use
 
     @MessageMapping("/reference/update") // for this annotation doesn't work @RequestMapping (send on "/app" (from socket config) + "/reference/update")
     public Mono<Void> changeReference(@Valid @NotNull RequestUpdateReferenceDTO update) {
@@ -45,7 +45,7 @@ public class ReferenceController {
     public Flux<ReferenceDTO> getReferences() {
 //        return Flux.fromIterable(referenceService.getAllReferences());
         return Mono.fromCallable(() ->
-                        referenceService.getAllReferences(claimService.getUserId())
+                        referenceService.getAllReferences(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
                 )
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(Flux::fromIterable);
@@ -54,7 +54,7 @@ public class ReferenceController {
     @GetMapping("/history/{id:.+}")
     public Mono<ReferenceDTO> getReferenceById(@PathVariable("id") @NotNull final UUID id) {
         return Mono.fromCallable(() ->
-                        referenceService.getReference(id, claimService.getUserId())
+                        referenceService.getReference(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
                 )
                 .subscribeOn(Schedulers.boundedElastic());
     }
