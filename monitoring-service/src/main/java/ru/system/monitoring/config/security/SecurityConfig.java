@@ -23,11 +23,9 @@ public class SecurityConfig {
 //                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
                 .authorizeHttpRequests(auth -> auth
-                                .anyRequest().permitAll()
-//                        .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth -> oauth.disable());
-//                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwkSetUri(jwkSetUri)));
         return http.build();
     }
 }
