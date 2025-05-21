@@ -33,4 +33,8 @@ public class JournalService {
     public List<SensorJournalEntityDTO> getAllSensorsData(UUID userId) {
         return sensorJournalRepository.getAllJournals(userId);
     }
+
+    public List<SensorJournalEntityDTO> getAllSensorsData() {
+        return sensorJournalRepository.getAllJournals();
+    }
 }

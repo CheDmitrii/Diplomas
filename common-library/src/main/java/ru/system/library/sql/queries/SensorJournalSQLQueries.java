@@ -14,6 +14,10 @@ public class SensorJournalSQLQueries {// todo: fixed
             """;
     public final String GET_ALL_JOURNALS = """
             SELECT * FROM system.sensor_journal sj
+            JOIN sensor_permission sp ON sp.sensor_id=sj.sensor_id;
+            """;
+    public final String GET_ALL_JOURNALS_BY_USER_ID = """
+            SELECT * FROM system.sensor_journal sj
             JOIN sensor_permission sp ON sp.sensor_id=sj.sensor_id
             WHERE sp.user_id=:user_id;""";
 }

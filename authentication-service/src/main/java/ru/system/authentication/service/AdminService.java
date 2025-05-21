@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.system.authentication.DTO.user.CreateUserRequestDTO;
 import ru.system.authentication.DTO.user.UpdateUserSensorRequestDTO;
 import ru.system.authentication.entity.User;
+import ru.system.authentication.repository.RoleRepository;
 import ru.system.authentication.repository.UserRepository;
 
 import java.util.UUID;
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class AdminService {
     private final UserRepository userRepository;
     private final SensorPermissionService permissionService;
+    private final RoleRepository roleRepository;
 
     public UUID createUser(CreateUserRequestDTO createUserDTO) {
         User user = userRepository.saveAndFlush(User.builder()
@@ -22,7 +24,9 @@ public class AdminService {
                 .firstName(createUserDTO.getFirstName())
                 .lastName(createUserDTO.getLastName())
                 .build());
-        permissionService.addSensorsForUser(user.getId(), createUserDTO.getSensors());
+        if (!roleRepository.findById(createUserDTO.getRole()).orElseThrow().getName().equalsIgnoreCase("admin")) {
+            permissionService.addSensorsForUser(user.getId(), createUserDTO.getSensors()); // todo if create admin add him all sensors
+        }
         return user.getId();
     }
 

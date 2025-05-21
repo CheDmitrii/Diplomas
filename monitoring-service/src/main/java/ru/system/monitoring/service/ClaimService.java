@@ -33,6 +33,14 @@ public class ClaimService {
         if ((claim instanceof Map)) {
             throw new HttpResponseEntityException(HttpStatus.BAD_REQUEST, "Bad jwt, user doesn't have role");
         }
-        return ((Map<String, Object>)claim).get("value").toString();
+        Object value = ((Map<String, Object>) claim).get("value");
+        if (value == null) {
+            throw new HttpResponseEntityException(HttpStatus.BAD_REQUEST, "Bad jwt, user doesn't have role");
+        }
+        return value.toString();
+    }
+
+    public boolean hasFullPermission() {
+        return this.getRole().equalsIgnoreCase("admin");
     }
 }

@@ -44,6 +44,16 @@ public class SensorService {
         return sensorInfo;
     }
 
+    public SensorDTO getSensorById(UUID sensorId) {
+        if (!sensorRepository.existsSensor(sensorId)) {
+            throw new HttpResponseEntityException(HttpStatus.NOT_FOUND,
+                    "Sensor with this sensorId {%s} doesn't exist".formatted(sensorId));
+        }
+        SensorDTO sensorInfo = sensorRepository.getSensorInfo(sensorId);
+        sensorInfo.setJournal(journalService.getSensorJournal(sensorId));
+        return sensorInfo;
+    }
+
     public List<SensorDTO> getAllSensors(UUID userId) {
         List<SensorDTO> allSensors = sensorRepository.getAllSensors(userId);
         Map<UUID, List<SensorJournalEntityDTO>> collectJournal = journalService.getAllSensorsData(userId)
@@ -57,6 +67,27 @@ public class SensorService {
                                             v.setId(null);
                                             return v;
                                             }, // JournalEntityDTO.builder().value(v.getValue()).time(v.getTime()).build()
+                                        Collectors.toList()
+                                )
+                        )
+                );
+        allSensors.forEach(v -> v.setJournal(collectJournal.get(v.getId())));
+        return allSensors;
+    }
+
+    public List<SensorDTO> getAllSensors() {
+        List<SensorDTO> allSensors = sensorRepository.getAllSensors();
+        Map<UUID, List<SensorJournalEntityDTO>> collectJournal = journalService.getAllSensorsData()
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                SensorJournalEntityDTO::getId,
+                                TreeMap::new,
+                                Collectors.mapping(
+                                        v -> {
+                                            v.setId(null);
+                                            return v;
+                                        }, // JournalEntityDTO.builder().value(v.getValue()).time(v.getTime()).build()
                                         Collectors.toList()
                                 )
                         )

@@ -42,9 +42,17 @@ public class SensorJournalRepository {
         return result;
     }
 
-    public List<SensorJournalEntityDTO> getAllJournals(UUID userId) {
+    public List<SensorJournalEntityDTO> getAllJournals() {
         return namedParameterJdbcTemplate.query(
                 SensorJournalSQLQueries.GET_ALL_JOURNALS,
+                Map.of(),
+                sensorJournalEntityMapper
+        );
+    }
+
+    public List<SensorJournalEntityDTO> getAllJournals(UUID userId) {
+        return namedParameterJdbcTemplate.query(
+                SensorJournalSQLQueries.GET_ALL_JOURNALS_BY_USER_ID,
                 Map.of("user_id", userId),
                 sensorJournalEntityMapper
         );

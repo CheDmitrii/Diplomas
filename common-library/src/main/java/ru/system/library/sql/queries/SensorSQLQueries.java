@@ -11,6 +11,12 @@ public class SensorSQLQueries {// todo: fixed
             SELECT s.*, r.id as reference_id, r.value, r.name as reference_name, m.name as machine_name FROM system.sensor s
             LEFT JOIN system.reference r ON s.id=r.sensor_id
             LEFT JOIN system.machine m ON s.machine_id=m.id
+            JOIN system.sensor_permission sp ON sp.sensor_id=s.id;
+            """;
+    public final String GET_ALL_SENSORS_BY_ID = """
+            SELECT s.*, r.id as reference_id, r.value, r.name as reference_name, m.name as machine_name FROM system.sensor s
+            LEFT JOIN system.reference r ON s.id=r.sensor_id
+            LEFT JOIN system.machine m ON s.machine_id=m.id
             JOIN system.sensor_permission sp ON sp.sensor_id=s.id
             WHERE sp.user_id=:user_id;"""; // ref may be null
     public final String GET_SENSOR_BY_ID = """

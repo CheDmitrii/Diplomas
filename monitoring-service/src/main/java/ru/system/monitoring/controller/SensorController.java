@@ -29,17 +29,25 @@ public class SensorController {
 
     @GetMapping("/{id:.+}")
     public Mono<ResponseEntity<SensorDTO>> getSensorById(@PathVariable("id") final UUID id) { // todo: change from id
-        return Mono.fromCallable(() ->
+        return Mono.fromCallable(() -> {
 //                ResponseEntity.ok(sensorService.getSensorById(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
-                ResponseEntity.ok(sensorService.getSensorById(id, claimService.getUserId()))
+                    if (claimService.hasFullPermission()) {
+                        sensorService.getSensorById(id);
+                    }
+                    return ResponseEntity.ok(sensorService.getSensorById(id, claimService.getUserId()));
+                }
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/all-sensors")
     public Mono<ResponseEntity<List<SensorDTO>>> getAllSensors() { // todo: change from id
-        return Mono.fromCallable(() ->
+        return Mono.fromCallable(() -> {
 //                ResponseEntity.ok(sensorService.getAllSensors(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
-                        ResponseEntity.ok(sensorService.getAllSensors(claimService.getUserId()))
+                    if (claimService.hasFullPermission()) {
+                        return ResponseEntity.ok(sensorService.getAllSensors());
+                    }
+                    return ResponseEntity.ok(sensorService.getAllSensors(claimService.getUserId()));
+                }
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -47,8 +55,7 @@ public class SensorController {
     public Mono<ResponseEntity<SensorCheckedDTO[]>> checkSensors() {
         return Mono.fromCallable(
                 () -> {
-                    String role = claimService.getRole();
-                    if (role != null && role.equalsIgnoreCase("admin")) {
+                    if (claimService.hasFullPermission()) {
                         return ResponseEntity.ok(sensorService.checkSensor(null));
                     }
                     return ResponseEntity.ok(sensorService.checkSensor(claimService.getUserId()));
@@ -60,8 +67,7 @@ public class SensorController {
     public Mono<ResponseEntity<Map<String, UUID>>> createSensor(@RequestBody @Valid SensorDTO sensor) {
         return Mono.fromCallable(
                     () -> {
-                        String role = claimService.getRole();
-                        if (role == null || !role.equalsIgnoreCase("admin")) {
+                        if (!claimService.hasFullPermission()) {
                             throw new HttpResponseEntityException(HttpStatus.FORBIDDEN, "Access denied");
                         }
                         return sensorService.createSensor(sensor);
