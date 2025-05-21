@@ -2,6 +2,7 @@ package ru.system.authentication.config.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -26,7 +27,9 @@ public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
-    private String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
+    private final String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
+    @Value("${spring.auth.login.uri}")
+    private String LOGIN_PAGE_URI;
 
     @Order(2)
     @Bean
@@ -41,7 +44,7 @@ public class SecurityConfig {
 //                .oauth2Login(Customizer.withDefaults())
                 // todo: тут задать кастомный loginUri
                 .formLogin(login -> login
-                        .loginPage("/loginss")
+                        .loginPage(LOGIN_PAGE_URI)
                         .loginProcessingUrl("/login")
                         .successHandler(loginSuccessHandler)
                         .permitAll())
@@ -50,10 +53,7 @@ public class SecurityConfig {
 //                        .logoutSuccessUrl("/test?url")
                         .addLogoutHandler(logoutSuccessHandler)
                         .logoutSuccessHandler(
-                                (request, response, authentication) -> {
-                                    response.sendRedirect(LOGIN_URL);
-//                                    response.sendRedirect("/test?url");
-                                }
+                                (request, response, authentication) -> response.sendRedirect(LOGIN_URL)
                         )
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")

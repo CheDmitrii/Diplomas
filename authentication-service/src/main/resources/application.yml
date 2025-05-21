@@ -28,6 +28,9 @@ spring:
       port: 6379
       username: redis
       password: password
+  auth:
+    login:
+      uri: http://localhost:3000/login
 
 cache:
   redis:

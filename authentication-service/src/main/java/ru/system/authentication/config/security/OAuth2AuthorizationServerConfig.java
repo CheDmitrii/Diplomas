@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -45,13 +46,14 @@ import java.util.UUID;
 public class OAuth2AuthorizationServerConfig {
 
 
-    private String LOGIN_URL_VALUE = "/loginss";
+    @Value("${spring.auth.login.uri}")
+    private String LOGIN_URL_VALUE;
     private final String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, CustomUserDetailsServer userDetailsService) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 //        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 //        var conf = new OAuth2AuthorizationServerConfiguration();
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
@@ -62,8 +64,6 @@ public class OAuth2AuthorizationServerConfig {
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/oauth2/**").permitAll() // Разрешить доступ к эндпоинтам OAuth2
                         .anyRequest().authenticated())
-//                .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login/**"))
-//                .oauth2ResourceServer(oauth -> oauth.jwt())
                 .formLogin(login -> login.loginPage(LOGIN_URL_VALUE));
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
 
