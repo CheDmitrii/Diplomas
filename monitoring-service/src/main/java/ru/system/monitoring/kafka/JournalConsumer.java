@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import ru.system.library.dto.common.SensorJournalEntityDTO;
 import ru.system.monitoring.service.JournalService;
 
@@ -24,7 +23,7 @@ public class JournalConsumer {
     @Value("${spring.kafka.topics.journal-topic}")
     private String JOURNAL_TOPIC_VALUE;
     private final JournalService journalService;
-    private final SimpMessagingTemplate messagingTemplate;
+//    private final SimpMessagingTemplate messagingTemplate;
 
     @Bean
     public KStream<String, SensorJournalEntityDTO> monitoringStream(StreamsBuilder builder) {
@@ -48,7 +47,7 @@ public class JournalConsumer {
             log.info("Save journal {}", v);
             // todo: right way write in in one socket instead each sensor socket
 //            messagingTemplate.convertAndSend("/topic/journal", v); // todo: think don't need
-            messagingTemplate.convertAndSend("/topic/journal" + v.getId(), v);
+//            messagingTemplate.convertAndSend("/topic/journal" + v.getId(), v);
         });
         return stream;
     }

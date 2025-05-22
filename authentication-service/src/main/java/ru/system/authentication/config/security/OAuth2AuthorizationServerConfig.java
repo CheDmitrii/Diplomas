@@ -48,7 +48,6 @@ public class OAuth2AuthorizationServerConfig {
 
     @Value("${spring.auth.login.uri}")
     private String LOGIN_URL_VALUE;
-    private final String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Bean
@@ -72,6 +71,7 @@ public class OAuth2AuthorizationServerConfig {
 
 
 
+    // change if you need another callback uri
     // http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback
 
     @Bean
@@ -79,15 +79,10 @@ public class OAuth2AuthorizationServerConfig {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("client")
                 .clientSecret("secret") // без шифрования
-//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .redirectUri("http://localhost:9000/oauth2/callback")
+                .redirectUri("http://localhost:9000/oauth2/callback") // port 9000 as this app and 3000 if react app
                 .scope(OidcScopes.OPENID)
                 .scope("offline_access")
                 .tokenSettings(TokenSettings.builder()

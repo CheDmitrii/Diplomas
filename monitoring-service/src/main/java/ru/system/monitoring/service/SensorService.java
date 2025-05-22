@@ -111,12 +111,4 @@ public class SensorService {
         }
         return opcuaSubscriber.checkSensors(sensorPermissionRepository.getUserSensors(userId));
     }
-
-    public Integer getValuetTest() throws ExecutionException, InterruptedException {
-        return opcuaSubscriber.getValue();// todo: drop
-    }
-
-    public SensorCheckedDTO[] testMethod() throws ExecutionException, InterruptedException {
-        return opcuaSubscriber.checkSensors(); // todo: drop
-    }
 }

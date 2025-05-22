@@ -22,7 +22,6 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.system.library.dto.common.SensorJournalEntityDTO;
 import ru.system.library.dto.common.sensor.SensorCheckedDTO;
@@ -48,7 +47,7 @@ public class OPCUASubscriber {
 
     private final SensorRepository sensorRepository;
     private final JournalService journalService;
-    private final SimpMessagingTemplate messagingTemplate;
+//    private final SimpMessagingTemplate messagingTemplate;
 
     private OpcUaClient client;
     private UaSubscription subscription;
@@ -72,8 +71,7 @@ public class OPCUASubscriber {
             //journalService.saveJournal(sensorJournal);
             //messagingTemplate.convertAndSend("/topic/journal" + sensorJournal.getId(), sensorJournal);
 
-            map = mapper.readValue(value.getValue().getValue().toString(), new TypeReference<Map<String, Object>>() {
-            });
+            map = mapper.readValue(value.getValue().getValue().toString(), new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
             log.error("{}", e.getMessage());
         }
@@ -98,79 +96,19 @@ public class OPCUASubscriber {
                 .build();
 
         this.client = OpcUaClient.create(config);
-        log.error("connection OPC UA state {}", client.connect().get().getSession().state());
+        log.info("connection OPC UA state {}", client.connect().get().getSession().state());
         this.subscription = client.getSubscriptionManager().createSubscription(100.0).get();
-        log.error("{}", subscription.getRequestedPublishingInterval());
         this.sensorsNameSpaceIndex = client.getNamespaceTable().getIndex(sensorOPCUri);
-        log.error("Namespace index {}", sensorsNameSpaceIndex);
-
+        log.error("Index of {} namespace is  {}", this.sensorOPCUri, sensorsNameSpaceIndex);
 
         this.configureSensorsNodeId();
         this.configureMethodsNodeId();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // todo: next don't need
-        NodeId nodeId = new NodeId(sensorsNameSpaceIndex, "976b3741-2f02-48fc-988c-53d86e3338fe"); // todo: implement for all sensors;
-        ReadValueId readValueId = new ReadValueId(nodeId, AttributeId.Value.uid(), null, null);
-
-//        DataChangeFilter filter = new DataChangeFilter(
-//                DataChangeTrigger.StatusValue,
-//                UInteger.valueOf(DeadbandType.None.getValue()),
-//                0.0
-//        );
-//        SerializationContext serializationContext = client.getStaticSerializationContext();
-//        ExtensionObject filterExtension = ExtensionObject.encode(serializationContext, filter);
-
-        MonitoringParameters parameters = new MonitoringParameters(
-                UInteger.valueOf(1),
-                100.0,
-                null,
-                uint(50),
-                Boolean.TRUE
-                );
-        MonitoredItemCreateRequest monitoredItemCreateRequest = new MonitoredItemCreateRequest(readValueId, MonitoringMode.Reporting, parameters);
-        UaMonitoredItem monitoredItem = subscription.createMonitoredItems(
-                TimestampsToReturn.Both,
-                List.of(monitoredItemCreateRequest),
-                (item, status) -> {
-                    log.info("Monitored item status: {}", StatusCode.GOOD.getValue() == status);
-                }
-        ).get().getFirst();
-//        log.error("{}", monitoredItem.getRequestedSamplingInterval());
-//        log.error("{}", monitoredItem.getRevisedSamplingInterval());
-
-        monitoredItem.setValueConsumer(value -> {
-            log.info("value of node is {}", value.getValue().getValue().toString());
-            Map<String, Object> map = null;
-            try {
-                map = mapper.readValue(value.getValue().getValue().toString(), new TypeReference<Map<String, Object>>(){});
-            } catch (Exception e) {
-                log.error("{}", e.getMessage());
-            }
-            if (map != null && map.containsKey("time")) {
-                log.error("Map is not null");
-                Timestamp time = Timestamp.valueOf((String) map.get("time"));
-                log.error("time is {}", time);
-            }
-        });
     }
 
     public SensorCheckedDTO[] checkSensors() throws ExecutionException, InterruptedException {
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCheckAllSensorsId, null);
         var result = client.call(request).get();
+        log.info("check all sensors response from OPC UA server {}", result);
         try {
             return mapper.readValue((String) result.getOutputArguments()[0].getValue(), SensorCheckedDTO[].class);
         } catch (JsonProcessingException e) {
@@ -182,6 +120,7 @@ public class OPCUASubscriber {
         Variant inputVariant = new Variant(sensors.stream().map(UUID::toString).toArray(String[]::new));
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCheckSensorsId, new Variant[]{inputVariant});
         var result = client.call(request).get();
+        log.info("check sensors response from OPC UA server {}", result);
         try {
             return mapper.readValue((String) result.getOutputArguments()[0].getValue(), SensorCheckedDTO[].class);
         } catch (JsonProcessingException e) {
@@ -201,22 +140,13 @@ public class OPCUASubscriber {
         Variant inputVariant = new Variant(mapper.writeValueAsString(map));
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCreateSensorId, new Variant[]{inputVariant});
         var result = client.call(request).get();
-        log.error("{}", result);
+        log.info("creating sensor response from OPC UA server {}", result);
         if (result.getStatusCode().isGood()) {
+            log.info("{} sensor created", sensor.getId());
             this.configureSensorNode(sensor.getId());
+        } else {
+            log.error("{} sensor creation failed", sensor.getId());
         }
-    }
-
-
-
-
-    // todo drop method
-    public Integer getValue() throws ExecutionException, InterruptedException {
-        NodeId objectId = new NodeId(sensorsNameSpaceIndex, "MyObjects");
-        NodeId methodId = new NodeId(sensorsNameSpaceIndex, "GetAnswer");
-        CallMethodRequest request = new CallMethodRequest(objectId, methodId, null);
-        var result = client.call(request).get();
-        return (Integer) result.getOutputArguments()[0].getValue();
     }
 
     public void configureSensorsNodeId() {
@@ -261,9 +191,6 @@ public class OPCUASubscriber {
 
     @PreDestroy
     public void stop() throws Exception {
-//        if (subscription != null) {
-////            subscription.delete(true).get();
-//        }
         if (client != null) {
             client.disconnect().get();
         }

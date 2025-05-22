@@ -22,19 +22,20 @@ public class MachineController {
 
     private final MachineService machineService;
     private final ClaimService claimService;
-    // todo: implements
 
     @GetMapping("/{id:.+}")
     public Mono<ResponseEntity<MachineDTO>> getMachine(@PathVariable("id") UUID machineId) {
+        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
         return Mono.fromCallable(() ->
-                        ResponseEntity.ok(machineService.getMachine(machineId, claimService.getUserId())))
+                        ResponseEntity.ok(machineService.getMachine(machineId, userId)))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/all-machines")
     public Mono<ResponseEntity<List<MachineDTO>>> getMachines() {
+        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
         return Mono.fromCallable(() ->
-                ResponseEntity.ok(machineService.getAllMachines(claimService.getUserId()))
+                ResponseEntity.ok(machineService.getAllMachines(userId))
         ).subscribeOn(Schedulers.boundedElastic());
     }
 }

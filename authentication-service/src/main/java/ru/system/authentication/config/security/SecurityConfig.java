@@ -67,7 +67,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
         corsConfiguration.setAllowedMethods(List.of("*"));
@@ -78,20 +78,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
-
-
-//    @Order(1)
-//    @Bean
-//    public SecurityFilterChain authServerFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .securityMatcher("/admin/**")
-//                .authorizeHttpRequests(authorize -> authorize
-//                                .anyRequest().permitAll()
-//                )
-//                .csrf(csrf -> csrf.disable());
-//
-//        return http.build();
-//    }
 
     /**
      * use this way when role put as single field ("role": "roleValue")
