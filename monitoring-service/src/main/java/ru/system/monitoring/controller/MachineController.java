@@ -25,17 +25,25 @@ public class MachineController {
 
     @GetMapping("/{id:.+}")
     public Mono<ResponseEntity<MachineDTO>> getMachine(@PathVariable("id") UUID machineId) {
-        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
-        return Mono.fromCallable(() ->
-                        ResponseEntity.ok(machineService.getMachine(machineId, userId)))
-                .subscribeOn(Schedulers.boundedElastic());
+//        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
+        return claimService.getUserId()
+                .map(userId -> machineService.getMachine(machineId, userId))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(ResponseEntity::ok);
+//        return Mono.fromCallable(() ->
+//                        ResponseEntity.ok(machineService.getMachine(machineId, userId)))
+//                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/all-machines")
     public Mono<ResponseEntity<List<MachineDTO>>> getMachines() {
-        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
-        return Mono.fromCallable(() ->
-                ResponseEntity.ok(machineService.getAllMachines(userId))
-        ).subscribeOn(Schedulers.boundedElastic());
+//        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
+        return claimService.getUserId()
+                .map(machineService::getAllMachines)
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(ResponseEntity::ok);
+//        return Mono.fromCallable(() ->
+//                ResponseEntity.ok(machineService.getAllMachines(userId))
+//        ).subscribeOn(Schedulers.boundedElastic());
     }
 }

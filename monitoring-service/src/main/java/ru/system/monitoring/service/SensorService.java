@@ -1,12 +1,11 @@
 package ru.system.monitoring.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.library.dto.common.sensor.SensorCheckedDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
+import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.library.exception.HttpResponseEntityException;
 import ru.system.monitoring.OPCUA.OPCUASubscriber;
 import ru.system.monitoring.repository.repository.ReferenceRepository;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,7 +94,7 @@ public class SensorService {
         return allSensors;
     }
 
-    public UUID createSensor(SensorDTO createSensor) throws ExecutionException, JsonProcessingException, InterruptedException {
+    public UUID createSensor(SensorDTO createSensor) {
         UUID sensorId = sensorRepository.createSensor(createSensor);
         if (createSensor.getReference() != null) {
             referenceRepository.createReference(createSensor.getReference(), createSensor, sensorId);
@@ -105,7 +103,7 @@ public class SensorService {
         return sensorId;
     }
 
-    public SensorCheckedDTO[] checkSensor(UUID userId) throws ExecutionException, InterruptedException {
+    public SensorCheckedDTO[] checkSensor(UUID userId) {
         if (userId == null) {
             return opcuaSubscriber.checkSensors();
         }

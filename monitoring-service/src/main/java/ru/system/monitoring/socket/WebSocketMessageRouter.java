@@ -2,6 +2,7 @@ package ru.system.monitoring.socket;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -14,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class WebSocketMessageRouter implements WebSocketHandler {
     private final Map<String, SocketMessageHandler> handlers;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -30,6 +32,8 @@ public class WebSocketMessageRouter implements WebSocketHandler {
                 .map(webSocketMessage -> webSocketMessage.getPayloadAsText())
                 .flatMap(payload -> {
                     try {
+                        log.info("--------- socket message received ---------");
+                        log.info(payload);
                         JsonNode jsonNode = objectMapper.readTree(payload);
                         String type = jsonNode.get("type").asText();
                         SocketMessageHandler handler = handlers.get(type);
@@ -50,7 +54,7 @@ public class WebSocketMessageRouter implements WebSocketHandler {
 
 
 //const socket = new WebSocket("ws://localhost:8228/socket");
-//
+// добавить токен при подключении
 //socket.onopen = () => {
 //        // Отправка сообщения с типом и данными
 //        const message = JSON.stringify({

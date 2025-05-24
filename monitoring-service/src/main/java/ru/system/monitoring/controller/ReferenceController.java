@@ -2,6 +2,7 @@ package ru.system.monitoring.controller;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,22 +38,29 @@ public class ReferenceController {
 
     @GetMapping("/history/all")
     public Flux<ReferenceDTO> getReferences() {
-        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
-        return Mono.fromCallable(() ->
-                        referenceService.getAllReferences(userId)
-//                        referenceService.getAllReferences(UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
-                )
+//        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
+        return claimService.getUserId()
+                .map(referenceService::getAllReferences)
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(Flux::fromIterable);
+//        return Mono.fromCallable(() ->
+//                        referenceService.getAllReferences(userId)
+//                )
+//                .subscribeOn(Schedulers.boundedElastic())
+//                .flatMapMany(Flux::fromIterable);
     }
 
     @GetMapping("/history/{id:.+}")
-    public Mono<ReferenceDTO> getReferenceById(@PathVariable("id") @NotNull final UUID id) {
-        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
-        return Mono.fromCallable(() ->
-                        referenceService.getReference(id, userId)
-//                        referenceService.getReference(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
-                )
-                .subscribeOn(Schedulers.boundedElastic());
+    public Mono<ResponseEntity<ReferenceDTO>> getReferenceById(@PathVariable("id") @NotNull final UUID id) {
+//        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
+        return claimService.getUserId()
+                .map(userId -> referenceService.getReference(id, userId))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(ResponseEntity::ok);
+//        return Mono.fromCallable(() ->
+//                        referenceService.getReference(id, userId)
+////                        referenceService.getReference(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
+//                )
+//                .subscribeOn(Schedulers.boundedElastic());
     }
 }

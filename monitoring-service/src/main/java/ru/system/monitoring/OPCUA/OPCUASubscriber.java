@@ -65,7 +65,7 @@ public class OPCUASubscriber {
     private Consumer<DataValue> sensorConsumer = value -> {
         Map<String, Object> map = null;
         try { // todo add messaging and db saving
-            SensorJournalEntityDTO sensorJournal = mapper.readValue(value.getValue().getValue().toString(), SensorJournalEntityDTO.class);
+//            SensorJournalEntityDTO sensorJournal = mapper.readValue(value.getValue().getValue().toString(), SensorJournalEntityDTO.class);
             // todo uncommit after drop kafka
             //journalService.saveJournal(sensorJournal);
             //messagingTemplate.convertAndSend("/topic/journal" + sensorJournal.getId(), sensorJournal);
@@ -104,9 +104,9 @@ public class OPCUASubscriber {
         this.configureMethodsNodeId();
     }
 
-    public SensorCheckedDTO[] checkSensors() throws ExecutionException, InterruptedException {
+    public SensorCheckedDTO[] checkSensors() {
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCheckAllSensorsId, null);
-        var result = client.call(request).get();
+        CallMethodResult result = this.getResult(request);
         log.info("check all sensors response from OPC UA server {}", result);
         try {
             return mapper.readValue((String) result.getOutputArguments()[0].getValue(), SensorCheckedDTO[].class);
@@ -115,10 +115,10 @@ public class OPCUASubscriber {
         }
     }
 
-    public SensorCheckedDTO[] checkSensors(List<UUID> sensors) throws ExecutionException, InterruptedException {
+    public SensorCheckedDTO[] checkSensors(List<UUID> sensors) {
         Variant inputVariant = new Variant(sensors.stream().map(UUID::toString).toArray(String[]::new));
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCheckSensorsId, new Variant[]{inputVariant});
-        var result = client.call(request).get();
+        CallMethodResult result = this.getResult(request);
         log.info("check sensors response from OPC UA server {}", result);
         try {
             return mapper.readValue((String) result.getOutputArguments()[0].getValue(), SensorCheckedDTO[].class);
@@ -127,7 +127,7 @@ public class OPCUASubscriber {
         }
     }
 
-    public void createSensor(SensorDTO sensor) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public void createSensor(SensorDTO sensor) {
         Map<String, String> map = new HashMap<>(Map.of(
                 "id", sensor.getId().toString(),
                 "name", sensor.getName(),
@@ -136,15 +136,31 @@ public class OPCUASubscriber {
         if (sensor.getReference() != null) {
             map.put("max-value", sensor.getReference().getValue().toString());
         }
-        Variant inputVariant = new Variant(mapper.writeValueAsString(map));
+        Variant inputVariant = null;
+        try {
+            inputVariant = new Variant(mapper.writeValueAsString(map));
+        } catch (JsonProcessingException e) {
+            throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, "Json parser error");
+        }
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCreateSensorId, new Variant[]{inputVariant});
-        var result = client.call(request).get();
+        var result = this.getResult(request);
         log.info("creating sensor response from OPC UA server {}", result);
         if (result.getStatusCode().isGood()) {
             log.info("{} sensor created", sensor.getId());
             this.configureSensorNode(sensor.getId());
         } else {
             log.error("{} sensor creation failed", sensor.getId());
+        }
+    }
+
+    public CallMethodResult getResult(CallMethodRequest request) {
+        if (request == null) {
+            throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, "Bad OPC UA request");
+        }
+        try {
+            return this.client.call(request).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -167,9 +183,7 @@ public class OPCUASubscriber {
             UaMonitoredItem monitoredItem = subscription.createMonitoredItems(
                     TimestampsToReturn.Both,
                     List.of(monitoredItemCreateRequest),
-                    (item, status) -> {
-                        log.info("Monitored item of sensor {} status: {}", sensorId, StatusCode.GOOD.getValue() == status);
-                    }
+                    (item, status) -> log.info("Monitored item of sensor {} status: {}", sensorId, StatusCode.GOOD.getValue() == status)
             ).get().getFirst();
             monitoredItem.setValueConsumer(sensorConsumer);
         } catch (InterruptedException | ExecutionException e) {
