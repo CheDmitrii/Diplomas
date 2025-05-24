@@ -1,4 +1,4 @@
-package ru.system.library.dto.common;
+package ru.system.library.dto.common.reference;
 
 import jakarta.validation.constraints.Size;
 import lombok.Builder;

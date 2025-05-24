@@ -1,7 +1,7 @@
 package ru.system.library.sql.repository.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.system.library.dto.common.ReferenceDTO;
+import ru.system.library.dto.common.reference.ReferenceDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.dto.common.sensor.SensorDTO.Machine;
 

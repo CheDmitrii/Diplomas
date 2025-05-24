@@ -3,7 +3,7 @@ package ru.system.monitoring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.system.library.dto.common.SensorJournalEntityDTO;
+import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.monitoring.repository.repository.SensorJournalRepository;
 import ru.system.monitoring.repository.repository.SensorRepository;
 

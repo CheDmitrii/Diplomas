@@ -34,7 +34,7 @@ public class SensorController {
         return Mono.fromCallable(() -> {
 //                ResponseEntity.ok(sensorService.getSensorById(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846")))
                     if (hasFullPermission) {
-                        sensorService.getSensorById(id);
+                        return ResponseEntity.ok(sensorService.getSensorById(id));
                     }
                     return ResponseEntity.ok(sensorService.getSensorById(id, userId));
                 }

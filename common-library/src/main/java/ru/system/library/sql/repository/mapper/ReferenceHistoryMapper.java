@@ -1,7 +1,7 @@
 package ru.system.library.sql.repository.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.system.library.dto.common.ReferenceHistoryEntityDTO;
+import ru.system.library.dto.common.reference.ReferenceHistoryEntityDTO;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
