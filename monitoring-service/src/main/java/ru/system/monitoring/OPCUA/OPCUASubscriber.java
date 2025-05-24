@@ -14,12 +14,16 @@ import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient;
 import org.eclipse.milo.opcua.stack.core.AttributeId;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
-import org.eclipse.milo.opcua.stack.core.types.builtin.*;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UShort;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.MonitoringMode;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -29,8 +33,8 @@ import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.library.exception.HttpResponseEntityException;
 import ru.system.monitoring.repository.repository.SensorRepository;
 import ru.system.monitoring.service.JournalService;
+import ru.system.monitoring.socket.publisher.MessagePublisher;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +51,8 @@ public class OPCUASubscriber {
 
     private final SensorRepository sensorRepository;
     private final JournalService journalService;
+    @Autowired
+    private final MessagePublisher messagePublisher;
 //    private final SimpMessagingTemplate messagingTemplate;
 
     private OpcUaClient client;
@@ -62,26 +68,6 @@ public class OPCUASubscriber {
     private String serverHost;
     @Value("${spring.opc.uri.sensors}")
     private String sensorOPCUri;
-
-    private Consumer<DataValue> sensorConsumer = value -> {
-        Map<String, Object> map = null;
-        try { // todo add messaging and db saving
-            SensorJournalEntityDTO sensorJournal = mapper.readValue(value.getValue().getValue().toString(), SensorJournalEntityDTO.class);
-            // todo uncommit after drop kafka
-            //journalService.saveJournal(sensorJournal);
-            //messagingTemplate.convertAndSend("/topic/journal" + sensorJournal.getId(), sensorJournal);
-
-            map = mapper.readValue(value.getValue().getValue().toString(), new TypeReference<Map<String, Object>>() {});
-        } catch (Exception e) {
-            log.error("{}", e.getMessage());
-        }
-
-        if (map != null && map.containsKey("time")) { // time mapping good
-            log.error("Map is not null");
-            Timestamp time = Timestamp.valueOf((String) map.get("time"));
-            log.error("time is {}", time);
-        }
-    };
 
     @PostConstruct
     public void start() throws Exception {
@@ -170,6 +156,23 @@ public class OPCUASubscriber {
     }
 
     public void configureSensorNode(UUID sensorId) {
+        Consumer<DataValue> sensorConsumer = value -> {
+            Map<String, Object> map = null;
+            try { // todo add messaging and db saving
+                String stringJournalEntity = value.getValue().getValue().toString();
+                SensorJournalEntityDTO sensorJournal = mapper.readValue(stringJournalEntity, SensorJournalEntityDTO.class);
+                // todo uncommit after drop kafka
+                //journalService.saveJournal(sensorJournal);
+                //messagingTemplate.convertAndSend("/topic/journal" + sensorJournal.getId(), sensorJournal);
+                messagePublisher.publish("/topic/journal/" + sensorJournal.getId(), stringJournalEntity);
+
+                map = mapper.readValue(stringJournalEntity, new TypeReference<Map<String, Object>>() {});
+            } catch (Exception e) {
+                log.error("{}", e.getMessage());
+            }
+        };
+
+
         NodeId nodeId = new NodeId(sensorsNameSpaceIndex, sensorId.toString());
         ReadValueId readValueId = new ReadValueId(nodeId, AttributeId.Value.uid(), null, null);
         MonitoringParameters parameters = new MonitoringParameters(

@@ -35,14 +35,15 @@ public class WebSocketMessageRouter implements WebSocketHandler {
                         log.info("--------- socket message received ---------");
                         log.info(payload);
                         JsonNode jsonNode = objectMapper.readTree(payload);
-                        String type = jsonNode.get("type").asText();
-                        SocketMessageHandler handler = handlers.get(type);
-                        if (handler != null) {
-                            return handler.handle(jsonNode, session);
-                        } else {
+                        String key = jsonNode.has("action") ? jsonNode.get("action").asText()
+                                : jsonNode.has("type") ? jsonNode.get("type").asText()
+                                : null;
+                        if (key == null) {
                             // Неизвестный тип сообщения
                             return Mono.empty();
                         }
+                        SocketMessageHandler handler = handlers.get(key);
+                        return handler.handle(jsonNode, session);
                     } catch (Exception e) {
                         e.printStackTrace();
                         return Mono.empty();
@@ -53,7 +54,7 @@ public class WebSocketMessageRouter implements WebSocketHandler {
 }
 
 
-//const socket = new WebSocket("ws://localhost:8228/socket");
+//const socket = new WebSocket("ws://localhost:8228/socket"); //  wss if https
 // добавить токен при подключении
 //socket.onopen = () => {
 //        // Отправка сообщения с типом и данными

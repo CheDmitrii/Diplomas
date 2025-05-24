@@ -4,19 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfig;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfigBuilder;
-import org.eclipse.milo.opcua.sdk.client.api.identity.UsernameProvider;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
 
-//@Configuration
+@Configuration
 @EnableConfigurationProperties(OpcUaConfigProperties.class)
 @RequiredArgsConstructor
 public class OpcUaConfig {
@@ -44,4 +41,11 @@ public class OpcUaConfig {
         return client.getSubscriptionManager()
                 .createSubscription(configProperties.getPublishingInterval()).get();
     }
+//
+//    @Bean
+//    public OPCUASubscriber openSubscriber(SensorRepository sensorRepository, JournalService journalService, MessagePublisher messagePublisher) throws Exception {
+//        OPCUASubscriber subscriber = new OPCUASubscriber(sensorRepository, journalService, messagePublisher);
+//        subscriber.start();
+//        return subscriber;
+//    }
 }
