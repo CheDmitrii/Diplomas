@@ -168,9 +168,9 @@ public class OPCUASubscriber {
         });
     }
 
-    public SensorCheckedDTO[] checkSensors() throws ExecutionException, InterruptedException {
+    public SensorCheckedDTO[] checkSensors() {
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCheckAllSensorsId, null);
-        var result = client.call(request).get();
+        var result = this.getResult(request);
         try {
             return mapper.readValue((String) result.getOutputArguments()[0].getValue(), SensorCheckedDTO[].class);
         } catch (JsonProcessingException e) {
@@ -178,10 +178,10 @@ public class OPCUASubscriber {
         }
     }
 
-    public SensorCheckedDTO[] checkSensors(List<UUID> sensors) throws ExecutionException, InterruptedException {
+    public SensorCheckedDTO[] checkSensors(List<UUID> sensors) {
         Variant inputVariant = new Variant(sensors.stream().map(UUID::toString).toArray(String[]::new));
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCheckSensorsId, new Variant[]{inputVariant});
-        var result = client.call(request).get();
+        var result = this.getResult(request);
         try {
             return mapper.readValue((String) result.getOutputArguments()[0].getValue(), SensorCheckedDTO[].class);
         } catch (JsonProcessingException e) {
@@ -189,7 +189,7 @@ public class OPCUASubscriber {
         }
     }
 
-    public void createSensor(SensorDTO sensor) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public void createSensor(SensorDTO sensor) {
         Map<String, String> map = new HashMap<>(Map.of(
                 "id", sensor.getId().toString(),
                 "name", sensor.getName(),
@@ -198,25 +198,29 @@ public class OPCUASubscriber {
         if (sensor.getReference() != null) {
             map.put("max-value", sensor.getReference().getValue().toString());
         }
-        Variant inputVariant = new Variant(mapper.writeValueAsString(map));
+        Variant inputVariant = null;
+        try {
+            inputVariant = new Variant(mapper.writeValueAsString(map));
+        } catch (JsonProcessingException e) {
+            throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, "Json parser error");
+        }
         CallMethodRequest request = new CallMethodRequest(this.objectId, this.methodCreateSensorId, new Variant[]{inputVariant});
-        var result = client.call(request).get();
+        var result = this.getResult(request);
         log.error("{}", result);
         if (result.getStatusCode().isGood()) {
             this.configureSensorNode(sensor.getId());
         }
     }
 
-
-
-
-    // todo drop method
-    public Integer getValue() throws ExecutionException, InterruptedException {
-        NodeId objectId = new NodeId(sensorsNameSpaceIndex, "MyObjects");
-        NodeId methodId = new NodeId(sensorsNameSpaceIndex, "GetAnswer");
-        CallMethodRequest request = new CallMethodRequest(objectId, methodId, null);
-        var result = client.call(request).get();
-        return (Integer) result.getOutputArguments()[0].getValue();
+    public CallMethodResult getResult(CallMethodRequest request) {
+        if (request == null) {
+            throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, "Bad OPC UA request");
+        }
+        try {
+            return this.client.call(request).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     public void configureSensorsNodeId() {

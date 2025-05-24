@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import ru.system.library.dto.common.MachineDTO;
 import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.MachineService;
@@ -25,16 +23,12 @@ public class MachineController {
     // todo: implements
 
     @GetMapping("/{id:.+}")
-    public Mono<ResponseEntity<MachineDTO>> getMachine(@PathVariable("id") UUID machineId) {
-        return Mono.fromCallable(() ->
-                        ResponseEntity.ok(machineService.getMachine(machineId, claimService.getUserId())))
-                .subscribeOn(Schedulers.boundedElastic());
+    public ResponseEntity<MachineDTO> getMachine(@PathVariable("id") UUID machineId) {
+        return ResponseEntity.ok(machineService.getMachine(machineId, claimService.getUserId()));
     }
 
     @GetMapping("/all-machines")
-    public Mono<ResponseEntity<List<MachineDTO>>> getMachines() {
-        return Mono.fromCallable(() ->
-                ResponseEntity.ok(machineService.getAllMachines(claimService.getUserId()))
-        ).subscribeOn(Schedulers.boundedElastic());
+    public ResponseEntity<List<MachineDTO>> getMachines() {
+        return ResponseEntity.ok(machineService.getAllMachines(claimService.getUserId()));
     }
 }

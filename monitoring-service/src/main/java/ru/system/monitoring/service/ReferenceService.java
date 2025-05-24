@@ -3,8 +3,6 @@ package ru.system.monitoring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import ru.system.library.dto.common.reference.ReferenceDTO;
 import ru.system.library.dto.common.reference.ReferenceHistoryEntityDTO;
 import ru.system.library.exception.HttpResponseEntityException;
@@ -12,7 +10,6 @@ import ru.system.monitoring.dto.RequestUpdateReferenceDTO;
 import ru.system.monitoring.repository.repository.ReferenceRepository;
 import ru.system.monitoring.repository.repository.SensorPermissionRepository;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,15 +22,12 @@ public class ReferenceService {
     private final SensorPermissionRepository sensorPermissionRepository;
 
 
-    public Mono<Void> saveChanges(RequestUpdateReferenceDTO updateReference, Timestamp time) {
-        return Mono.fromRunnable(() -> {
-                    if (!referenceRepository.existsReference(updateReference.getId())) {
-                        throw new HttpResponseEntityException(HttpStatus.NOT_FOUND,
-                                "Reference with this id {%s} doesn't exist".formatted(updateReference.getId()));
-                    }
-                    referenceRepository.changeValue(updateReference, time);
-                }
-                ).subscribeOn(Schedulers.boundedElastic()).then();
+    public void saveChanges(RequestUpdateReferenceDTO updateReference) {
+        if (!referenceRepository.existsReference(updateReference.getId())) {
+            throw new HttpResponseEntityException(HttpStatus.NOT_FOUND,
+                    "Reference with this id {%s} doesn't exist".formatted(updateReference.getId()));
+        }
+        referenceRepository.changeValue(updateReference, updateReference.getTime());
     }
 
 

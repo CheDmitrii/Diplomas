@@ -3,6 +3,7 @@ package ru.system.monitoring.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
@@ -13,4 +14,5 @@ public class RequestUpdateReferenceDTO {
     private Double newValue;
     @NotNull
     private Double oldValue;
+    private Timestamp time;
 }

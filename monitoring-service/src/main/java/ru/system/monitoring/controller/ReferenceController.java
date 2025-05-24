@@ -31,14 +31,10 @@ public class ReferenceController {
     private final ClaimService claimService; //todo: start use
 
     @MessageMapping("/reference/update") // for this annotation doesn't work @RequestMapping (send on "/app" (from socket config) + "/reference/update")
-    public Mono<Void> changeReference(@Valid @NotNull RequestUpdateReferenceDTO update) {
-        Timestamp time = Timestamp.valueOf(LocalDateTime.now());
-        return referenceService
-                .saveChanges(update, time)
-                .doOnSuccess(v ->
-                        messagingTemplate.convertAndSend("/topic/references" + update.getId(), update)
-                )
-                .then();
+    public void changeReference(@Valid @NotNull RequestUpdateReferenceDTO update) {
+        update.setTime(Timestamp.valueOf(LocalDateTime.now()));
+        referenceService.saveChanges(update);
+        messagingTemplate.convertAndSend("/topic/references" + update.getId(), update);
     }
 
     @GetMapping("/history/all")
