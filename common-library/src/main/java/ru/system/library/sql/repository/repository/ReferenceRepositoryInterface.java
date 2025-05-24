@@ -2,7 +2,7 @@ package ru.system.library.sql.repository.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import ru.system.library.dto.common.ReferenceDTO;
+import ru.system.library.dto.common.reference.ReferenceDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.sql.queries.ReferenceSQLQueries;
 

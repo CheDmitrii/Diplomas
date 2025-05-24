@@ -3,8 +3,7 @@ package ru.system.library.dto.common.sensor;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-import ru.system.library.dto.common.SensorJournalEntityDTO;
-import ru.system.library.dto.common.ReferenceDTO;
+import ru.system.library.dto.common.reference.ReferenceDTO;
 
 import java.util.List;
 import java.util.UUID;

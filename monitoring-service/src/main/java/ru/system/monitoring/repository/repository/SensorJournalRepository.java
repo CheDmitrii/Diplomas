@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import ru.system.library.dto.common.SensorJournalEntityDTO;
+import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.library.sql.repository.mapper.SensorJournalEntityMapperCut;
 import ru.system.library.sql.repository.mapper.SensorJournalEntityMapper;
 import ru.system.library.sql.queries.SensorJournalSQLQueries;

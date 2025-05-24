@@ -1,4 +1,4 @@
-package ru.system.library.dto.common;
+package ru.system.library.dto.common.sensor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -23,7 +23,6 @@ import org.eclipse.milo.opcua.stack.core.types.structured.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import ru.system.library.dto.common.SensorJournalEntityDTO;
 import ru.system.library.dto.common.sensor.SensorCheckedDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.exception.HttpResponseEntityException;

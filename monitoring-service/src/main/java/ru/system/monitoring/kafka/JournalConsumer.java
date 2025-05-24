@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import ru.system.library.dto.common.SensorJournalEntityDTO;
+import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.monitoring.service.JournalService;
 
 @Configuration

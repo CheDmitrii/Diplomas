@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import ru.system.library.dto.common.ReferenceDTO;
+import ru.system.library.dto.common.reference.ReferenceDTO;
 import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.ReferenceService;
 
