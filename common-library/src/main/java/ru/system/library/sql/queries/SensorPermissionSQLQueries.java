@@ -3,7 +3,7 @@ package ru.system.library.sql.queries;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class SensorPermissionSQLQueries {// todo: fixed
+public class SensorPermissionSQLQueries {
     public final String IS_ALLOWED_SENSOR = """
             SELECT EXISTS(SELECT 1 FROM system.sensor_permission sp
             WHERE sp.user_id=:user_id AND sp.sensor_id=:sensor_id);""";

@@ -25,7 +25,7 @@ public class AdminService {
                 .lastName(createUserDTO.getLastName())
                 .build());
         if (!roleRepository.findById(createUserDTO.getRole()).orElseThrow().getName().equalsIgnoreCase("admin")) {
-            permissionService.addSensorsForUser(user.getId(), createUserDTO.getSensors()); // todo if create admin add him all sensors
+            permissionService.addSensorsForUser(user.getId(), createUserDTO.getSensors());
         }
         return user.getId();
     }

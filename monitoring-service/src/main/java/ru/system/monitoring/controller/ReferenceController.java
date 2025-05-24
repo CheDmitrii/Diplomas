@@ -22,45 +22,21 @@ import java.util.UUID;
 public class ReferenceController {
 
     private final ReferenceService referenceService;
-//    private final SimpMessagingTemplate messagingTemplate;
     private final ClaimService claimService;
-
-//    @MessageMapping("/reference/update") // for this annotation doesn't work @RequestMapping (send on "/app" (from socket config) + "/reference/update")
-//    public Mono<Void> changeReference(@Valid @NotNull RequestUpdateReferenceDTO update) {
-//        Timestamp time = Timestamp.valueOf(LocalDateTime.now());
-//        return referenceService
-//                .saveChanges(update, time)
-//                .doOnSuccess(v ->
-//                        messagingTemplate.convertAndSend("/topic/references" + update.getId(), update)
-//                )
-//                .then();
-//    }
 
     @GetMapping("/history/all")
     public Flux<ReferenceDTO> getReferences() {
-//        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
         return claimService.getUserId()
                 .map(referenceService::getAllReferences)
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(Flux::fromIterable);
-//        return Mono.fromCallable(() ->
-//                        referenceService.getAllReferences(userId)
-//                )
-//                .subscribeOn(Schedulers.boundedElastic())
-//                .flatMapMany(Flux::fromIterable);
     }
 
     @GetMapping("/history/{id:.+}")
-    public Mono<ResponseEntity<ReferenceDTO>> getReferenceById(@PathVariable("id") @NotNull final UUID id) {
-//        UUID userId = claimService.getUserId().block(); // todo: when implement flux put it inside mono
+    public Mono<ResponseEntity<ReferenceDTO>> getReferenceById(@PathVariable("id") @NotNull final UUID referenceId) {
         return claimService.getUserId()
-                .map(userId -> referenceService.getReference(id, userId))
+                .map(userId -> referenceService.getReference(referenceId, userId))
                 .subscribeOn(Schedulers.boundedElastic())
                 .map(ResponseEntity::ok);
-//        return Mono.fromCallable(() ->
-//                        referenceService.getReference(id, userId)
-////                        referenceService.getReference(id, UUID.fromString("15ad4a35-a925-4b92-b54a-4030a412b846"))
-//                )
-//                .subscribeOn(Schedulers.boundedElastic());
     }
 }

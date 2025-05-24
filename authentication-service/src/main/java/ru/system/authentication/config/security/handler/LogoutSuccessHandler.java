@@ -21,7 +21,6 @@ import ru.system.library.exception.HttpResponseEntityException;
 public class LogoutSuccessHandler implements LogoutHandler {
 
     private final String LOGOUT_TYPE_VALUE = "LOGOUT";
-    private String POST_LOGOUT_URL;
     private final RedisCacheManager cacheManager;
     private final UserService userService;
 
@@ -31,7 +30,6 @@ public class LogoutSuccessHandler implements LogoutHandler {
         if (!(principal instanceof User user)) {
             throw new HttpResponseEntityException(HttpStatus.INTERNAL_SERVER_ERROR, "Wrong data of user to logout");
         }
-        // todo: change on repository
         userService.saveUserJournal(user, LOGOUT_TYPE_VALUE);
 
         Cache cache = cacheManager.getCache("user");

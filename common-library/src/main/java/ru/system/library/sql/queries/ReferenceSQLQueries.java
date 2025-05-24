@@ -3,7 +3,7 @@ package ru.system.library.sql.queries;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class ReferenceSQLQueries { // todo: fixed
+public class ReferenceSQLQueries {
     public final String CREATE_REFERENCE = """
             INSERT INTO system.reference (id, sensor_id, name, value)
             VALUES(uuid_generate_v4(), :sensor_id, :name, :value);

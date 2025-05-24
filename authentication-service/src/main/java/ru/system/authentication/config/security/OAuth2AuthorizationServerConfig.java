@@ -1,6 +1,5 @@
 package ru.system.authentication.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -41,14 +40,13 @@ import java.util.UUID;
 /*
 посмотри пример для конфигурации spring boot auhtentication server oauth2 и напиши реализацию для logout
 * */
-
+// todo: think about RS512
 @Configuration
 public class OAuth2AuthorizationServerConfig {
 
 
     @Value("${spring.auth.login.uri}")
     private String LOGIN_URL_VALUE;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -117,23 +115,6 @@ public class OAuth2AuthorizationServerConfig {
                 .issuer("http://localhost:9000")
                 .build();
     }
-
-//    @Bean
-//    public OidcProviderMetadataClaimCustomizer providerMetadataCustomizer() {
-//        OidcProviderMetadataClaimAccessor
-//        return (metadataContext) -> {
-//            OidcProviderMetadata metadata = metadataContext.getProviderMetadata();
-//            // Customize the id_token_signing_alg_values_supported claim
-//            metadata.setClaim(OidcProviderMetadataClaim.ID_TOKEN_SIGNING_ALG_VALUES_SUPPORTED.getName(), Arrays.asList("RS512"));
-//        };
-//    }
-//    public JwtEncoder jwtEncoder() throws Exception {
-//        return new NimbusJwtEncoder(jwkSource());
-//    }
-//    public JwtDecoder jwtDecoder() throws Exception {
-//
-//    }
-
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer(CustomUserDetailsServer userDetailsService) {

@@ -3,7 +3,7 @@ package ru.system.library.sql.queries;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class SensorSQLQueries {// todo: fixed
+public class SensorSQLQueries {
     public final String GET_ALL_SENSORS_IDS = """
             SELECT s.id FROM system.sensor s;
             """;

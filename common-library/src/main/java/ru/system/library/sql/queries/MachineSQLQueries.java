@@ -3,7 +3,7 @@ package ru.system.library.sql.queries;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class MachineSQLQueries { // todo: realise
+public class MachineSQLQueries {
     public final String EXISTS_MACHINE = """
             SELECT EXISTS(SELECT 1 FROM system.machine WHERE id=:id);
             """;
@@ -42,5 +42,4 @@ public class MachineSQLQueries { // todo: realise
             SELECT * FROM system.machine
             WHERE id=:machine_id;
             """;
-
 }

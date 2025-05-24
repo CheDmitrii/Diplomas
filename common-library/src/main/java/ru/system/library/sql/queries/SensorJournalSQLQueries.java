@@ -3,7 +3,7 @@ package ru.system.library.sql.queries;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class SensorJournalSQLQueries {// todo: fixed
+public class SensorJournalSQLQueries {
     public final String WRITE_JOURNAL = """
             INSERT INTO system.sensor_journal
             VALUES(uuid_generate_v4(), :sensor_id, :value, :time);

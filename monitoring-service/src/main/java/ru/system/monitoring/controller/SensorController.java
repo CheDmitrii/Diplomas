@@ -28,32 +28,19 @@ public class SensorController {
     private final ClaimService claimService;
 
     @GetMapping("/{id:.+}")
-    public Mono<ResponseEntity<SensorDTO>> getSensorById(@PathVariable("id") final UUID id) {
-//        boolean hasFullPermission = claimService.hasFullPermission(); // todo: when implement flux put it inside mono
-//        UUID userId = claimService.getUserId();
-//        boolean hasFullPermission = true;
-//        UUID userId = UUID.randomUUID();
-//        return Mono.fromCallable(() -> {
-//                    if (hasFullPermission) {
-//                        sensorService.getSensorById(id);
-//                    }
-//                    return ResponseEntity.ok(sensorService.getSensorById(id, userId));
-//                }
-//        ).subscribeOn(Schedulers.boundedElastic());
+    public Mono<ResponseEntity<SensorDTO>> getSensorById(@PathVariable("id") final UUID sensorId) {
         return claimService.hasFullPermission()
                 .flatMap(fullPermission -> {
                     if (fullPermission) {
-                        return Mono.just(ResponseEntity.ok(sensorService.getSensorById(id)));
+                        return Mono.just(ResponseEntity.ok(sensorService.getSensorById(sensorId)));
                     }
-                    return claimService.getUserId().map(userId -> ResponseEntity.ok(sensorService.getSensorById(id, userId)));
+                    return claimService.getUserId().map(userId -> ResponseEntity.ok(sensorService.getSensorById(sensorId, userId)));
                 })
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/all-sensors")
     public Mono<ResponseEntity<List<SensorDTO>>> getAllSensors() {
-//        boolean hasFullPermission = claimService.hasFullPermission(); // todo: when implement flux put it inside mono
-//        UUID userId = claimService.getUserId();
         return claimService.hasFullPermission()
                 .flatMap(fullPermission -> {
                     log.error("------------------ inside all-sensors ------------------");
@@ -63,29 +50,10 @@ public class SensorController {
                     return claimService.getUserId().map(userId -> ResponseEntity.ok(sensorService.getAllSensors(userId)));
                 })
                 .subscribeOn(Schedulers.boundedElastic());
-//        return Mono.fromCallable(() -> {
-//                    if (hasFullPermission) {
-//                        return ResponseEntity.ok(sensorService.getAllSensors());
-//                    }
-//                    return ResponseEntity.ok(sensorService.getAllSensors(userId));
-//                }
-//        ).subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/check-sensors")
     public Mono<ResponseEntity<SensorCheckedDTO[]>> checkSensors() {
-//        boolean hasFullPermission = claimService.hasFullPermission(); // todo: when implement flux put it inside mono
-//        UUID userId = claimService.getUserId();
-//        boolean hasFullPermission = true;
-//        UUID userId = UUID.randomUUID();
-//        return Mono.fromCallable(
-//                () -> {
-//                    if (hasFullPermission) {
-//                        return ResponseEntity.ok(sensorService.checkSensor(null));
-//                    }
-//                    return ResponseEntity.ok(sensorService.checkSensor(userId));
-//                }
-//        ).subscribeOn(Schedulers.boundedElastic());
         return claimService.hasFullPermission()
                 .flatMap(fullPermission -> {
                     if (fullPermission) {
@@ -99,18 +67,6 @@ public class SensorController {
 
     @PostMapping("/create")
     public Mono<ResponseEntity<Map<String, UUID>>> createSensor(@RequestBody @Valid SensorDTO sensor) {
-//        boolean hasFullPermission = claimService.hasFullPermission(); // todo: when implement flux put it inside mono
-//        boolean hasFullPermission = true;
-//        return Mono.fromCallable(
-//                    () -> {
-//                        if (!hasFullPermission) {
-//                            throw new HttpResponseEntityException(HttpStatus.FORBIDDEN, "Access denied");
-//                        }
-//                        return sensorService.createSensor(sensor);
-//                    }
-//                )
-//                .map(v -> ResponseEntity.ok(Map.of("id", v)))
-//                .subscribeOn(Schedulers.boundedElastic());
         return claimService.hasFullPermission()
                 .flatMap(fullPermission -> {
                     if (!fullPermission) {

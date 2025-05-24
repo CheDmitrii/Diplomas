@@ -97,7 +97,7 @@ public class SensorService {
     public UUID createSensor(SensorDTO createSensor) {
         UUID sensorId = sensorRepository.createSensor(createSensor);
         if (createSensor.getReference() != null) {
-            referenceRepository.createReference(createSensor.getReference(), createSensor, sensorId);
+            referenceRepository.createReference(createSensor.getReference(), sensorId);
         }
         opcuaSubscriber.createSensor(createSensor);
         return sensorId;

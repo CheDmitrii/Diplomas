@@ -31,7 +31,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         }
 
 
-        userService.saveUserJournal(user, LOGIN_TYPE_VALUE); // todo change on repository
+        userService.saveUserJournal(user, LOGIN_TYPE_VALUE);
         log.info("User {} success login", user.getLogin());
 
         super.onAuthenticationSuccess(request, response, authentication);

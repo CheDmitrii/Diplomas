@@ -13,9 +13,6 @@ import java.util.UUID;
 
 @Repository
 public interface SensorPermissionRepository extends JpaRepository<SensorPermission, SensorPermissionId> {
-    List<SensorPermission> findByUserId(UUID userId);
-
-    // todo: fix in report
     @Query(value = "SELECT new ru.system.library.dto.common.sensor.SensorPairDTO(sp.sensorId, s.name) FROM SensorPermission sp " +
             "JOIN Sensor s ON s.id=sp.sensorId " +
             "WHERE sp.userId=:user_id")
@@ -25,10 +22,4 @@ public interface SensorPermissionRepository extends JpaRepository<SensorPermissi
             "JOIN Sensor s ON s.id=sp.sensorId " +
             "WHERE sp.userId!=:user_id")
     List<SensorPairDTO> findAllSensorsOfNotUser(@Param("user_id") UUID userId);
-
-    @Query(value = "SELECT new ru.system.library.dto.common.sensor.SensorPairDTO(sp.sensorId, s.name) FROM SensorPermission sp " +
-            "JOIN Sensor s ON s.id=sp.sensorId")
-    List<SensorPairDTO> findAllSensors();
-    @Query(value = "SELECT sp.sensorId FROM SensorPermission sp WHERE sp.userId=:userId")
-    List<UUID> findAllSensorIdsByUserId(@Param("user_id") UUID userId);
 }

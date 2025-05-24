@@ -71,12 +71,3 @@ CREATE TABLE sensor_permission (
     user_id         UUID            NOT NULL REFERENCES "user"(id) ON UPDATE CASCADE ON DELETE CASCADE,
     sensor_id       UUID            NOT NULL REFERENCES sensor(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
-CREATE TABLE sensor_error (
-    id              UUID            NOT NULL UNIQUE,
-    sensor_id       UUID            NOT NULL REFERENCES sensor(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    reference       REAL            NOT NULL,
-    value           REAL            NOT NULL,
-    time            TIMESTAMPTZ     NOT NULL,
-    PRIMARY KEY(id)
-);

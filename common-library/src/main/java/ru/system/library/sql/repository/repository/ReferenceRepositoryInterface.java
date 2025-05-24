@@ -3,7 +3,6 @@ package ru.system.library.sql.repository.repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import ru.system.library.dto.common.reference.ReferenceDTO;
-import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.sql.queries.ReferenceSQLQueries;
 
 import java.util.Map;
@@ -23,7 +22,7 @@ public abstract class ReferenceRepositoryInterface {
         );
     }
 
-    public UUID createReference(ReferenceDTO reference, SensorDTO sensorDTO, UUID sensor_id) { // todo: fix after
+    public UUID createReference(ReferenceDTO reference, UUID sensor_id) {
         return namedParameterJdbcTemplate.queryForObject(
                 ReferenceSQLQueries.CREATE_REFERENCE,
                 Map.of(

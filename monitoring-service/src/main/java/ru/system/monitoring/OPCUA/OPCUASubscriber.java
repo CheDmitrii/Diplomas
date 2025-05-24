@@ -53,7 +53,6 @@ public class OPCUASubscriber {
     private final JournalService journalService;
     @Autowired
     private final MessagePublisher messagePublisher;
-//    private final SimpMessagingTemplate messagingTemplate;
 
     private OpcUaClient client;
     private UaSubscription subscription;
@@ -123,7 +122,7 @@ public class OPCUASubscriber {
         if (sensor.getReference() != null) {
             map.put("max-value", sensor.getReference().getValue().toString());
         }
-        Variant inputVariant = null;
+        Variant inputVariant;
         try {
             inputVariant = new Variant(mapper.writeValueAsString(map));
         } catch (JsonProcessingException e) {
@@ -157,13 +156,12 @@ public class OPCUASubscriber {
 
     public void configureSensorNode(UUID sensorId) {
         Consumer<DataValue> sensorConsumer = value -> {
-            Map<String, Object> map = null;
+            Map<String, Object> map = null; // todo drop
             try { // todo add messaging and db saving
                 String stringJournalEntity = value.getValue().getValue().toString();
                 SensorJournalEntityDTO sensorJournal = mapper.readValue(stringJournalEntity, SensorJournalEntityDTO.class);
                 // todo uncommit after drop kafka
                 //journalService.saveJournal(sensorJournal);
-                //messagingTemplate.convertAndSend("/topic/journal" + sensorJournal.getId(), sensorJournal);
                 messagePublisher.publish("/topic/journal/" + sensorJournal.getId(), stringJournalEntity);
 
                 map = mapper.readValue(stringJournalEntity, new TypeReference<Map<String, Object>>() {});

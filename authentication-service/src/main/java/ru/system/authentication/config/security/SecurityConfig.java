@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
-    private final String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
+    private final String LOGOUT_REDIRECT_URI_VALUE = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
     @Value("${spring.auth.login.uri}")
     private String LOGIN_PAGE_URI;
 
@@ -53,7 +53,7 @@ public class SecurityConfig {
 //                        .logoutSuccessUrl("/test?url")
                         .addLogoutHandler(logoutSuccessHandler)
                         .logoutSuccessHandler(
-                                (request, response, authentication) -> response.sendRedirect(LOGIN_URL)
+                                (request, response, authentication) -> response.sendRedirect(LOGOUT_REDIRECT_URI_VALUE)
                         )
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
