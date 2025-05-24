@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import ru.system.library.dto.common.sensor.SensorCheckedDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
+import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.library.exception.HttpResponseEntityException;
 import ru.system.monitoring.repository.repository.SensorRepository;
 import ru.system.monitoring.service.JournalService;
@@ -65,7 +66,7 @@ public class OPCUASubscriber {
     private Consumer<DataValue> sensorConsumer = value -> {
         Map<String, Object> map = null;
         try { // todo add messaging and db saving
-//            SensorJournalEntityDTO sensorJournal = mapper.readValue(value.getValue().getValue().toString(), SensorJournalEntityDTO.class);
+            SensorJournalEntityDTO sensorJournal = mapper.readValue(value.getValue().getValue().toString(), SensorJournalEntityDTO.class);
             // todo uncommit after drop kafka
             //journalService.saveJournal(sensorJournal);
             //messagingTemplate.convertAndSend("/topic/journal" + sensorJournal.getId(), sensorJournal);
