@@ -41,7 +41,7 @@ import java.util.UUID;
 /*
 посмотри пример для конфигурации spring boot auhtentication server oauth2 и напиши реализацию для logout
 * */
-
+// todo: think about RS512
 @Configuration
 public class OAuth2AuthorizationServerConfig {
 
@@ -68,6 +68,7 @@ public class OAuth2AuthorizationServerConfig {
 
 
 
+    // change if you need another callback uri
     // login uri => http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback
 
     @Bean
@@ -78,9 +79,10 @@ public class OAuth2AuthorizationServerConfig {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .redirectUri("http://localhost:9000/oauth2/callback")
+                .redirectUri("http://localhost:9000/oauth2/callback") // port 9000 as this app and 3000 if react app
+                .redirectUri("http://localhost:3000/oauth2/callback")
                 .scope(OidcScopes.OPENID)
-                .scope("offline_access")
+//                .scope("offline_access") // allow use refresh token when it's expired
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofMinutes(20))
                         .refreshTokenTimeToLive(Duration.ofMinutes(30))
@@ -113,7 +115,6 @@ public class OAuth2AuthorizationServerConfig {
                 .issuer("http://localhost:9000")
                 .build();
     }
-
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer(CustomUserDetailsServer userDetailsService) {

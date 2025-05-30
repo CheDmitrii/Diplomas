@@ -95,12 +95,12 @@ public class SensorService {
     }
 
     public UUID createSensor(SensorDTO createSensor) {
-        UUID sensorId = sensorRepository.createSensor(createSensor);
+        createSensor.setId(sensorRepository.createSensor(createSensor));
         if (createSensor.getReference() != null) {
-            referenceRepository.createReference(createSensor.getReference(), createSensor, sensorId);
+            referenceRepository.createReference(createSensor.getReference(), createSensor.getId());
         }
         opcuaSubscriber.createSensor(createSensor);
-        return sensorId;
+        return createSensor.getId();
     }
 
     public SensorCheckedDTO[] checkSensor(UUID userId) {
