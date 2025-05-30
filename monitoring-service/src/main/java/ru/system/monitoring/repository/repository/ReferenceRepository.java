@@ -48,8 +48,8 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
                 referenceHistoryMapper);
     }
 
-    public List<ReferenceHistoryEntityDTO> getAllReferenceHistory(UUID userID) {
-        return namedParameterJdbcTemplate.query( // todo: fix
+    public List<ReferenceHistoryEntityDTO> getAllReferenceHistory() {
+        return namedParameterJdbcTemplate.query(
                 ReferenceSQLQueries.GET_ALL_REFERENCE_HISTORY,
                 referenceHistoryMapper
         );

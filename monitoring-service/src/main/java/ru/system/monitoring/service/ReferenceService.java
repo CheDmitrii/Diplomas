@@ -48,7 +48,7 @@ public class ReferenceService {
 
     public List<ReferenceDTO> getAllReferences(UUID userID) {
         List<ReferenceDTO> references = referenceRepository.getAllReferences(userID);
-        Map<UUID, List<ReferenceHistoryEntityDTO>> groupedHistory = referenceRepository.getAllReferenceHistory(userID)
+        Map<UUID, List<ReferenceHistoryEntityDTO>> groupedHistory = referenceRepository.getAllReferenceHistory()
                 .stream()
                 .collect(Collectors.groupingBy(ReferenceHistoryEntityDTO::getId));
         references.forEach(referenceDTO -> referenceDTO.setHistory(groupedHistory.get(referenceDTO.getId())));
