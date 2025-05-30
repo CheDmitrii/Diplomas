@@ -1,6 +1,7 @@
 package ru.system.library.sql.repository.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.sql.queries.SensorSQLQueries;
@@ -24,11 +25,11 @@ public abstract class SensorRepositoryInterface {
     public UUID createSensor(SensorDTO sensorDTO) {
         return namedParameterJdbcTemplate.queryForObject(
                 SensorSQLQueries.CREATE_SENSOR,
-                Map.of(
-                        "name", sensorDTO.getName(),
-                        "machine_id", sensorDTO.getMachine().getId(),
-                        "description", sensorDTO.getDescription()
-                ),
+                new MapSqlParameterSource() // MapSqlParameterSource support null instead Map.of() method
+                        .addValue("name", sensorDTO.getName())
+                        .addValue("machine_id", sensorDTO.getMachine() != null ? sensorDTO.getMachine().getId() : null)
+                        .addValue("description", sensorDTO.getDescription())
+                        .addValue("type", sensorDTO.getType()),
                 UUID.class
         );
     }

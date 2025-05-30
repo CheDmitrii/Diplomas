@@ -27,6 +27,6 @@ public class SensorSQLQueries {
     public final String EXIST_SENSOR = """
             SELECT EXISTS(SELECT 1 FROM system.sensor WHERE id=:id);""";
     public final String CREATE_SENSOR = """
-            INSERT INTO system.sensor VALUES(uuid_generate_v4(), :name, :description, :machine_id)
+            INSERT INTO system.sensor VALUES(uuid_generate_v4(), :name, :type, :description, :machine_id)
             returning id;""";
 }
