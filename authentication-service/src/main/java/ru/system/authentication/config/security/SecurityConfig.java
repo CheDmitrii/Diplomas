@@ -37,12 +37,13 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/loginss", "/login").permitAll() // todo: custom login???
+                        .requestMatchers(LOGIN_PAGE_URI).permitAll()
+                        .requestMatchers("/admin/create-user", "/admin/user/update-sensor/", "/admin/sensor/",
+                                "admin/not-user-sensor/", "/admin/sensor/all-sensors").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login", "/loginss", "/logout/**"))
 //                .oauth2Login(Customizer.withDefaults())
-                // todo: тут задать кастомный loginUri
                 .formLogin(login -> login
                         .loginPage(LOGIN_PAGE_URI)
                         .loginProcessingUrl("/login")
