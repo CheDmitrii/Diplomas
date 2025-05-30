@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,7 +27,11 @@ import java.util.UUID;
 @Table(name = "user")
 public class User implements UserDetails, CredentialsContainer {
     @Id
-    @Column(name = "id")
+    // this way is deprecated
+//    @GeneratedValue(generator = "UUID")
+//    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @NotNull
