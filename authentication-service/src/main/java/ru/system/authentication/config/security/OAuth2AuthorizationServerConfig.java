@@ -1,6 +1,5 @@
 package ru.system.authentication.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -27,6 +26,7 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 import ru.system.authentication.entity.User;
 import ru.system.authentication.service.user.userDetails.CustomUserDetailsServer;
 
@@ -48,15 +48,14 @@ public class OAuth2AuthorizationServerConfig {
 
     @Value("${spring.auth.login.uri}")
     private String LOGIN_URL_VALUE;
-    private final String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 OAuth2AuthorizationServerConfigurer.authorizationServer();
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
@@ -69,19 +68,14 @@ public class OAuth2AuthorizationServerConfig {
 
 
 
-    // http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback
+    // login uri => http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback
 
     @Bean
     public InMemoryRegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("client")
                 .clientSecret("secret") // без шифрования
-//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .redirectUri("http://localhost:9000/oauth2/callback")
@@ -119,22 +113,6 @@ public class OAuth2AuthorizationServerConfig {
                 .issuer("http://localhost:9000")
                 .build();
     }
-
-//    @Bean
-//    public OidcProviderMetadataClaimCustomizer providerMetadataCustomizer() {
-//        OidcProviderMetadataClaimAccessor
-//        return (metadataContext) -> {
-//            OidcProviderMetadata metadata = metadataContext.getProviderMetadata();
-//            // Customize the id_token_signing_alg_values_supported claim
-//            metadata.setClaim(OidcProviderMetadataClaim.ID_TOKEN_SIGNING_ALG_VALUES_SUPPORTED.getName(), Arrays.asList("RS512"));
-//        };
-//    }
-//    public JwtEncoder jwtEncoder() throws Exception {
-//        return new NimbusJwtEncoder(jwkSource());
-//    }
-//    public JwtDecoder jwtDecoder() throws Exception {
-//
-//    }
 
 
     @Bean

@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
-    private final String LOGIN_URL = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
+    private final String LOGOUT_REDIRECT_URI_VALUE = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
     @Value("${spring.auth.login.uri}")
     private String LOGIN_PAGE_URI;
 
@@ -54,7 +54,7 @@ public class SecurityConfig {
 //                        .logoutSuccessUrl("/test?url")
                         .addLogoutHandler(logoutSuccessHandler)
                         .logoutSuccessHandler(
-                                (request, response, authentication) -> response.sendRedirect(LOGIN_URL)
+                                (request, response, authentication) -> response.sendRedirect(LOGOUT_REDIRECT_URI_VALUE)
                         )
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
@@ -68,31 +68,18 @@ public class SecurityConfig {
         return http.build();
     }
 
-    CorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000")); // 👈 frontend origin
         corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowCredentials(true); // 👈 если frontend передаёт cookie или Authorization header
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
-
-
-//    @Order(1)
-//    @Bean
-//    public SecurityFilterChain authServerFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .securityMatcher("/admin/**")
-//                .authorizeHttpRequests(authorize -> authorize
-//                                .anyRequest().permitAll()
-//                )
-//                .csrf(csrf -> csrf.disable());
-//
-//        return http.build();
-//    }
 
     /**
      * use this way when role put as single field ("role": "roleValue")
