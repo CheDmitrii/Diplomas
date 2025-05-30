@@ -49,3 +49,4 @@ INSERT INTO system.reference (id, name, value, sensor_id) VALUES ('72ee569d-5f59
 INSERT INTO system.reference (id, name, value, sensor_id) VALUES ('9e089214-f2ad-4666-9ba3-f20f6e695e41', 'Гомогенизация.температура', 65, '59f6f71b-3ede-4c63-a162-fbc4dd53ffdd');
 INSERT INTO system.reference (id, name, value, sensor_id) VALUES ('c61f5384-444b-4e88-9c73-e41c35408e60', 'Гомогенизация.давление', 15, '36574620-1278-49cb-9dcf-fd2a34148aa2');
 INSERT INTO system.reference (id, name, value, sensor_id) VALUES ('6a5c9b87-ceff-4d92-abad-cbacaaa44ba9', 'Смешивание2.температура', 14, '3c703a09-0889-44d6-949b-0996732470d2');
+INSERT INTO system.reference (id, name, value, sensor_id) VALUES ('1087010f-5f88-40a9-b7d0-dbaeb3ab3a2d', 'Пастеризационно-охладительная установка.температура', 35, '1087010f-5f88-40a9-b7d0-dbaeb3ab3a2a');

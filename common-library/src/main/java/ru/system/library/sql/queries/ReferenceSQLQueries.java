@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 public class ReferenceSQLQueries {
     public final String CREATE_REFERENCE = """
             INSERT INTO system.reference (id, sensor_id, name, value)
-            VALUES(uuid_generate_v4(), :sensor_id, :name, :value);
+            VALUES(uuid_generate_v4(), :sensor_id, :name, :value)
             returning id;""";
     public final String CREATE_REFERENCE_JOURNAL = """
             INSERT INTO system.reference_journal VALUES(uuid_generate_v4(), :reference_id, :old_value, :new_value, :time);""";

@@ -80,8 +80,9 @@ public class OAuth2AuthorizationServerConfig {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .redirectUri("http://localhost:9000/oauth2/callback") // port 9000 as this app and 3000 if react app
+                .redirectUri("http://localhost:3000/oauth2/callback")
                 .scope(OidcScopes.OPENID)
-                .scope("offline_access")
+//                .scope("offline_access") // allow use refresh token when it's expired
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofMinutes(20))
                         .refreshTokenTimeToLive(Duration.ofMinutes(30))
