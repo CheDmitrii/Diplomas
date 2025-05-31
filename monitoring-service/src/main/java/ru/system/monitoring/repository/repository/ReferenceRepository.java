@@ -56,7 +56,12 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
     }
 
 
-    public void changeValue(RequestUpdateReferenceDTO updateReference, Timestamp time) {
+    public void changeValue(RequestUpdateReferenceDTO updateReference) {
+        namedParameterJdbcTemplate.update(
+                ReferenceSQLQueries.UPDATE_VALUE,
+                Map.of("reference_id", updateReference.getId(), "value", updateReference.getNewValue()));
+    }
+    public void changeJournal(RequestUpdateReferenceDTO updateReference, Timestamp time) {
         namedParameterJdbcTemplate.update(
                 ReferenceSQLQueries.CREATE_REFERENCE_JOURNAL,
                 Map.of("reference_id", updateReference.getId(),
@@ -64,8 +69,5 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
                         "new_value", updateReference.getNewValue(),
                         "time", time)
         );
-        namedParameterJdbcTemplate.update(
-                ReferenceSQLQueries.UPDATE_VALUE,
-                Map.of("reference_id", updateReference.getId(), "value", updateReference.getNewValue()));
     }
 }

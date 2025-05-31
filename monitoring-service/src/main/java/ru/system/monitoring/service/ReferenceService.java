@@ -31,7 +31,8 @@ public class ReferenceService {
                         throw new HttpResponseEntityException(HttpStatus.NOT_FOUND,
                                 "Reference with this id {%s} doesn't exist".formatted(updateReference.getId()));
                     }
-                    referenceRepository.changeValue(updateReference, time);
+                    referenceRepository.changeValue(updateReference);
+                    referenceRepository.changeJournal(updateReference, time);
                 }
                 ).subscribeOn(Schedulers.boundedElastic()).then();
     }
