@@ -61,6 +61,7 @@ public class ReferenceRepository extends ReferenceRepositoryInterface {
                 ReferenceSQLQueries.UPDATE_VALUE,
                 Map.of("reference_id", updateReference.getId(), "value", updateReference.getNewValue()));
     }
+
     public void changeJournal(RequestUpdateReferenceDTO updateReference, Timestamp time) {
         namedParameterJdbcTemplate.update(
                 ReferenceSQLQueries.CREATE_REFERENCE_JOURNAL,
