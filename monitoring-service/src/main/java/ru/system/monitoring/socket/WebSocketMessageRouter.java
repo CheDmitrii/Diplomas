@@ -69,6 +69,11 @@ public class WebSocketMessageRouter implements WebSocketHandler {
                                 }
                             })
                             .then()
+                            .onErrorResume(e -> {
+                                log.error("Error processing update", e);
+                                // Можно отправить сообщение об ошибке клиенту или просто завершить
+                                return Mono.empty();
+                            })
                 )
                 .onErrorResume(e -> session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Invallid token")));
     }
