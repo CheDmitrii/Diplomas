@@ -26,7 +26,7 @@ public class ReferenceSQLQueries { // todo: fixed
     public final String UPDATE_VALUE = """
             UPDATE system.reference
             SET value=:value
-            WHERE reference_id=:reference_id""";
+            WHERE id=:reference_id""";
     public final String EXISTS_REFERENCE = """
             SELECT EXISTS(SELECT 1 FROM system.reference WHERE id=:id);""";
 }
