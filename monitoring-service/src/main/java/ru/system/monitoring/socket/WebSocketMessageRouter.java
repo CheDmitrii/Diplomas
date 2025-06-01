@@ -26,11 +26,12 @@ public class WebSocketMessageRouter implements WebSocketHandler {
     private final ReactiveJwtDecoder jwtDecoder;
     private final Map<String, SocketMessageHandler> handlers;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final SocketSubscriptionManager subscriptionManager;
 
-    public WebSocketMessageRouter(List<SocketMessageHandler> handlers, ReactiveJwtDecoder jwtDecoder) {
+    public WebSocketMessageRouter(List<SocketMessageHandler> handlers, SocketSubscriptionManager subscriptionManager, ReactiveJwtDecoder jwtDecoder) {
         this.jwtDecoder = jwtDecoder;
-        this.handlers = handlers.stream()
-                .collect(Collectors.toMap(SocketMessageHandler::getType, Function.identity()));
+        this.subscriptionManager = subscriptionManager;
+        this.handlers = handlers.stream().collect(Collectors.toMap(SocketMessageHandler::getType, Function.identity()));
     }
 
 
@@ -68,6 +69,7 @@ public class WebSocketMessageRouter implements WebSocketHandler {
                                     return Mono.empty();
                                 }
                             })
+                            .doFinally(signalType -> subscriptionManager.cleanupSession(session.getId()))
                             .then()
                             .onErrorResume(e -> {
                                 log.error("Error processing update", e);
