@@ -34,13 +34,13 @@ public class AdminController {
     @GetMapping("/users/{value:.+}")
     public ResponseEntity<SingleUserDTO> findUser(@PathVariable("value") String value) {
         SingleUserDTO user = adminService.getUser(value);
-        adminService.checkUpdateUser(claimService.getUserId(), user.getId());
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/user/update-sensor/{id:.+}")
     public ResponseEntity<Void> updateSensor(@RequestBody UpdateUserSensorRequestDTO updateDTO,
                                              @PathVariable("id") UUID userId) {
+        adminService.checkUpdateUser(claimService.getUserId(), userId);
         adminService.changeUserSensors(userId, updateDTO);
         return ResponseEntity.ok().build();
     }
