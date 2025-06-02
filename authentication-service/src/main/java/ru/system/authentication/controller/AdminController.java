@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.system.authentication.DTO.user.CreateUserRequestDTO;
+import ru.system.authentication.DTO.user.SingleUserDTO;
 import ru.system.authentication.DTO.user.UpdateUserSensorRequestDTO;
 import ru.system.authentication.service.AdminService;
 import ru.system.authentication.service.SensorPermissionService;
@@ -26,6 +27,11 @@ public class AdminController {
     public ResponseEntity<Void> createUser(@RequestBody CreateUserRequestDTO createUserRequestDTO) {
         adminService.createUser(createUserRequestDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<SingleUserDTO>> getAllUser() {
+        return ResponseEntity.ok(adminService.getAllUsers());
     }
 
     @PostMapping("/user/update-sensor/{id:.+}")
