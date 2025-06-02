@@ -27,6 +27,12 @@ public class AdminService {
                 .orElseThrow(() -> new HttpResponseEntityException(HttpStatus.NOT_FOUND, "User with this value doesn't exist"));
     }
 
+    public void checkUpdateUser(UUID curUserId, UUID userId) {
+        if (curUserId.compareTo(userId) != 0 && userRepository.getUserRoleById(userId).equalsIgnoreCase("ADMIN")) {
+            throw new HttpResponseEntityException(HttpStatus.NOT_ACCEPTABLE, "This user can't change as it's admin");
+        }
+    }
+
     public UUID createUser(CreateUserRequestDTO createUserDTO) {
         Role role = roleRepository.findById(createUserDTO.getRole())
                 .orElseThrow(() -> new HttpResponseEntityException(HttpStatus.BAD_REQUEST, "Role not found with id: " + createUserDTO.getRole()));

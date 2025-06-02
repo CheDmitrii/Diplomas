@@ -7,6 +7,7 @@ import ru.system.authentication.DTO.user.CreateUserRequestDTO;
 import ru.system.authentication.DTO.user.SingleUserDTO;
 import ru.system.authentication.DTO.user.UpdateUserSensorRequestDTO;
 import ru.system.authentication.service.AdminService;
+import ru.system.authentication.service.ClaimService;
 import ru.system.authentication.service.SensorPermissionService;
 import ru.system.authentication.service.SensorService;
 import ru.system.library.dto.common.sensor.SensorPairDTO;
@@ -22,6 +23,7 @@ public class AdminController {
     private final AdminService adminService;
     private final SensorPermissionService sensorPermissionService;
     private final SensorService sensorService;
+    private final ClaimService claimService;
 
     @PostMapping("/create-user")
     public ResponseEntity<Void> createUser(@RequestBody CreateUserRequestDTO createUserRequestDTO) {
@@ -30,8 +32,10 @@ public class AdminController {
     }
 
     @GetMapping("/users/{value:.+}")
-    public ResponseEntity<SingleUserDTO> finaUser(@PathVariable("value") String value) {
-        return ResponseEntity.ok(adminService.getUser(value));
+    public ResponseEntity<SingleUserDTO> findUser(@PathVariable("value") String value) {
+        SingleUserDTO user = adminService.getUser(value);
+        adminService.checkUpdateUser(claimService.getUserId(), user.getId());
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/user/update-sensor/{id:.+}")
