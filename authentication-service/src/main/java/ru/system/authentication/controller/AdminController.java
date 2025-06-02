@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.system.authentication.DTO.user.CreateUserRequestDTO;
 import ru.system.authentication.DTO.user.SingleUserDTO;
 import ru.system.authentication.DTO.user.UpdateUserSensorRequestDTO;
-import ru.system.authentication.service.AdminService;
-import ru.system.authentication.service.ClaimService;
-import ru.system.authentication.service.SensorPermissionService;
-import ru.system.authentication.service.SensorService;
+import ru.system.authentication.entity.Role;
+import ru.system.authentication.service.*;
 import ru.system.library.dto.common.sensor.SensorPairDTO;
 
 import java.util.List;
@@ -24,11 +22,17 @@ public class AdminController {
     private final SensorPermissionService sensorPermissionService;
     private final SensorService sensorService;
     private final ClaimService claimService;
+    private final RoleService roleService;
 
     @PostMapping("/create-user")
     public ResponseEntity<Void> createUser(@RequestBody CreateUserRequestDTO createUserRequestDTO) {
         adminService.createUser(createUserRequestDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/roles/all")
+    public ResponseEntity<List<Role>> getAllRole() {
+        return ResponseEntity.ok(roleService.getRoles());
     }
 
     @GetMapping("/users/{value:.+}")
