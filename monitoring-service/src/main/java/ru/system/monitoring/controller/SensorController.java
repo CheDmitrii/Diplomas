@@ -13,6 +13,7 @@ import ru.system.library.dto.common.sensor.SensorDTO;
 import ru.system.library.exception.HttpResponseEntityException;
 import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.SensorService;
+import ru.system.monitoring.socket.publisher.MessagePublisher;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class SensorController {
 
     private final SensorService sensorService;
     private final ClaimService claimService;
+    private final MessagePublisher messagePublisher;
 
     @GetMapping("/{id:.+}")
     public Mono<ResponseEntity<SensorDTO>> getSensorById(@PathVariable("id") final UUID sensorId) {
@@ -77,5 +79,18 @@ public class SensorController {
                     ));
                 })
                 .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @PostMapping("/send-data/{id:.+}")
+    public Mono<Void> testMethodSensData(@PathVariable("id") UUID sensorId, @RequestBody int value) {
+        messagePublisher.publish("/topic/journal/" + sensorId, String.valueOf(value));
+        return Mono.fromCallable(() -> {
+                    messagePublisher.publish("/topic/journal/" + sensorId, String.valueOf(value));
+                    return null;
+                })
+                .onErrorResume(e -> {
+                    log.error("Error processing update", e);
+                    return Mono.empty();
+                }).then();
     }
 }
