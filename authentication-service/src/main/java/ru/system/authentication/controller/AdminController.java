@@ -29,14 +29,14 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<SingleUserDTO>> getAllUser() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    @GetMapping("/users/{value:.+}")
+    public ResponseEntity<SingleUserDTO> finaUser(@PathVariable("value") String value) {
+        return ResponseEntity.ok(adminService.getUser(value));
     }
 
     @PostMapping("/user/update-sensor/{id:.+}")
     public ResponseEntity<Void> updateSensor(@RequestBody UpdateUserSensorRequestDTO updateDTO,
-                                                   @PathVariable("id") UUID userId) {
+                                             @PathVariable("id") UUID userId) {
         adminService.changeUserSensors(userId, updateDTO);
         return ResponseEntity.ok().build();
     }

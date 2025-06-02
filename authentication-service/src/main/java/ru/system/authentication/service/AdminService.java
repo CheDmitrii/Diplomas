@@ -12,7 +12,6 @@ import ru.system.authentication.repository.RoleRepository;
 import ru.system.authentication.repository.UserRepository;
 import ru.system.library.exception.HttpResponseEntityException;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,8 +21,10 @@ public class AdminService {
     private final SensorPermissionService permissionService;
     private final RoleRepository roleRepository;
 
-    public List<SingleUserDTO> getAllUsers() {
-        return userRepository.getAllUsers();
+    public SingleUserDTO getUser(String value) {
+        return userRepository
+                .findUser(value)
+                .orElseThrow(() -> new HttpResponseEntityException(HttpStatus.NOT_FOUND, "User with this value doesn't exist"));
     }
 
     public UUID createUser(CreateUserRequestDTO createUserDTO) {
