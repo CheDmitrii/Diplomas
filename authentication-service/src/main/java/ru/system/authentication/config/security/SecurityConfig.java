@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(LOGIN_PAGE_URI).permitAll()
                         .requestMatchers("/admin/create-user", "/admin/user/update-sensor/", "/admin/sensor/",
-                                "admin/not-user-sensor/", "/admin/sensor/all-sensors", "/admin/users/{value:.+}").hasRole("ADMIN")
+                                "admin/not-user-sensor/", "/admin/sensor/all-sensors", "/admin/users/{value:.+}",
+                                "/admin/roles/all").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login", "/loginss", "/logout/**"))
