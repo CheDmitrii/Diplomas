@@ -11,7 +11,9 @@ public class MessagePublisher {
     private final Map<String, Sinks.Many<String>> topicSinks = new ConcurrentHashMap<>();
 
     public void publish(String topic, String message) {
-        topicSinks.computeIfAbsent(topic, key -> Sinks.many().multicast().onBackpressureBuffer()) // send with buffering without subscribers
+        topicSinks.computeIfAbsent(topic, key -> Sinks.many().replay().limit(5)) // send with buffering without subscribers.
+                // With (Sinks.many().multicast().onBackpressureBuffer()) doesn't work front,
+                // but work without buffering (Sinks.many().multicast().directBestEffort())
                 .tryEmitNext(message);
     }
 
