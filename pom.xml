@@ -38,7 +38,6 @@
     <modules>
         <module>common-library</module>
         <module>monitoring-service</module>
-        <module>simulation-service</module>
         <module>authentication-service</module>
     </modules>
 

@@ -1,0 +1,41 @@
+sensors:
+  - id: 976b3741-2f02-48fc-988c-53d86e3338fe
+    name: Распределительный бачок.уровень
+    max-value: 25
+    status: good
+  - id: 63ef82f5-86ad-44be-80ec-1afe20d571d7
+    name: Распределительный бачок.температура
+    status: GOOD
+  - id: ea636933-a999-439c-9b0e-3ec36c129f75
+    name: Пастеризационно-охладительная установка.уровень
+    status: GOOD
+  - id: 1087010f-5f88-40a9-b7d0-dbaeb3ab3a2a
+    name: Пастеризационно-охладительная установка.температура
+    status: GOOD
+  - id: 36574620-1278-49cb-9dcf-fd2a34148aa2
+    name: Гомогенизация.давление
+    status: GOOD
+  - id: 59f6f71b-3ede-4c63-a162-fbc4dd53ffdd
+    name: Гомогенизация.температура
+    status: GOOD
+  - id: a47cb5ac-af55-407b-81c5-107c96e95cdc
+    name: Гомогенизация.уровень
+    status: GOOD
+  - id: a2589d51-4039-49ed-8ec5-156596685c72
+    name: Заквасочный аппарат.уровень
+    status: GOOD
+  - id: 84dead43-305c-4e35-b6d2-61034fa7fdd9
+    name: Заквасочный аппарат.температура
+    status: GOOD
+  - id: dd991a28-bf2a-4fe6-907f-4bb5eda632f0
+    name: Резервуар.температура
+    status: GOOD
+  - id: 0b7b42fa-a54e-4713-ba10-f09b059f800d
+    name: Резервуар.уровень
+    status: GOOD
+  - id: 3c703a09-0889-44d6-949b-0996732470d2
+    name: Насос1.частота
+    status: GOOD
+  - id: 8d526fcf-73bb-4a48-8f70-0a3a8d88de5b
+    name: Насос1.потом
+    status: GOOD
