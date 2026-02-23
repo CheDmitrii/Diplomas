@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
-    private final String LOGOUT_REDIRECT_URI_VALUE = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
+//    private final String LOGOUT_REDIRECT_URI_VALUE = "http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback";
     @Value("${spring.auth.login.uri}")
     private String LOGIN_PAGE_URI;
 
@@ -44,7 +44,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/**", "/login", "/loginss", "/logout/**"))
-//                .oauth2Login(Customizer.withDefaults())
                 .formLogin(login -> login
                         .loginPage(LOGIN_PAGE_URI)
                         .loginProcessingUrl("/login")
@@ -52,13 +51,9 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-//                        .logoutSuccessUrl("/test?url")
                         .addLogoutHandler(logoutSuccessHandler)
-                        .logoutSuccessHandler(
-                                (request, response, authentication) -> response.sendRedirect(LOGOUT_REDIRECT_URI_VALUE)
-                        )
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("JSESSIONID", "remember-me")
                 )
                 .oauth2ResourceServer(auth -> auth
                         .jwt(jwt -> jwt

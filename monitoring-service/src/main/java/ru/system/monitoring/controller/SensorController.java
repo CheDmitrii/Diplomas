@@ -1,5 +1,6 @@
 package ru.system.monitoring.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,11 +11,14 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import ru.system.library.dto.common.sensor.SensorCheckedDTO;
 import ru.system.library.dto.common.sensor.SensorDTO;
+import ru.system.library.dto.common.sensor.SensorJournalEntityDTO;
 import ru.system.library.exception.HttpResponseEntityException;
 import ru.system.monitoring.service.ClaimService;
 import ru.system.monitoring.service.SensorService;
 import ru.system.monitoring.socket.publisher.MessagePublisher;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -84,8 +88,13 @@ public class SensorController {
     @PostMapping("/send-data/{id:.+}")
     public Mono<Void> testMethodSensData(@PathVariable("id") UUID sensorId, @RequestBody int value) {
         messagePublisher.publish("/topic/journal/" + sensorId, String.valueOf(value));
+        ObjectMapper objectMapper = new ObjectMapper();
         return Mono.fromCallable(() -> {
-                    messagePublisher.publish("/topic/journal/" + sensorId, String.valueOf(value));
+                    messagePublisher.publish("/topic/journal/" + sensorId, objectMapper.writeValueAsString(SensorJournalEntityDTO.builder()
+                            .id(sensorId)
+                            .time(Timestamp.valueOf(LocalDateTime.now()))
+                            .value((double)value)
+                            .build()));
                     return null;
                 })
                 .onErrorResume(e -> {

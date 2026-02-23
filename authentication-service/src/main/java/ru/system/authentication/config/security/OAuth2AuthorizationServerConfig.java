@@ -66,8 +66,6 @@ public class OAuth2AuthorizationServerConfig {
         return http.build();
     }
 
-
-
     // change if you need another callback uri
     // http://localhost:9000/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:9000/oauth2/callback
 
@@ -81,6 +79,7 @@ public class OAuth2AuthorizationServerConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .redirectUri("http://localhost:9000/oauth2/callback") // port 9000 as this app and 3000 if react app
                 .redirectUri("http://localhost:3000/oauth2/callback")
+                .postLogoutRedirectUri("http://localhost:9000/oauth2/test") // maybe
                 .scope(OidcScopes.OPENID)
 //                .scope("offline_access") // allow use refresh token when it's expired
                 .tokenSettings(TokenSettings.builder()

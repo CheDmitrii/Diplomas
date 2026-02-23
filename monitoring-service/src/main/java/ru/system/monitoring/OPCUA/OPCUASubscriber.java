@@ -164,7 +164,8 @@ public class OPCUASubscriber {
                 //journalService.saveJournal(sensorJournal);
                 messagePublisher.publish("/topic/journal/" + sensorJournal.getId(), stringJournalEntity);
 
-                map = mapper.readValue(stringJournalEntity, new TypeReference<Map<String, Object>>() {});
+                map = mapper.readValue(stringJournalEntity, new TypeReference<Map<String, Object>>() {
+                });
             } catch (Exception e) {
                 log.error("{}", e.getMessage());
             }

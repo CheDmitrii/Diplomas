@@ -12,10 +12,10 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:9000/oauth2/jwks
 
-  opcua:
-    client:
-      endpointUri: opc.udp//
-      publishingInterval: 500
+#  opcua:
+#    client:
+#      endpointUri: opc.udp//
+#      publishingInterval: 500
   jackson:
     default-property-inclusion: NON_NULL
   db:

@@ -37,7 +37,7 @@ public class LogoutSuccessHandler implements LogoutHandler {
             cache.evict(user.getLogin());
         }
 
-        log.error("User {} success logout", user.getLogin());
+        log.info("User {} success logout", user.getLogin());
         SecurityContextHolder.clearContext();
         request.getSession().invalidate();
     }

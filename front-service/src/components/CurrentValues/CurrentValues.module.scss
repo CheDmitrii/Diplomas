@@ -1,0 +1,80 @@
+$second-color: #ddd;
+$main-color: #2A2929;
+$second-color2: #eee;
+$main-color2: #171717;
+
+.CurrentValuesForm {
+    min-width: 500px;
+    h1 {
+        margin: 0;
+        padding: 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+    span {
+        font-size: 16px;
+    }
+}
+
+[data-theme="light"] {
+    h1 {
+        color: black;
+    }
+
+    span {
+        color: black;
+    }
+
+    .Wrapper {
+        background-color: $second-color;
+    }
+    .Container {
+        flex-direction: column;
+    }
+        .Sensor {
+        background-color: $second-color2;
+    }
+  }
+
+[data-theme="dark"] {
+    h1 {
+        color: white;
+    }
+
+    span {
+        color: white;
+    }
+
+    .Wrapper {
+        background-color: $main-color;
+    }
+    .Sensor {
+        background-color: $main-color2;
+    }
+}
+
+.Wrapper {
+    display: flex;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.Container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.RefContainer {
+    display: flex;
+    align-items: center;
+}
+
+.Sensor {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+}

@@ -30,8 +30,8 @@ spring:
       password: password
   auth:
     login:
+#      uri: /loginss
       uri: http://localhost:3000/login
-
 cache:
   redis:
     cacheNames:
